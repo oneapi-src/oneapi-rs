@@ -8,8 +8,9 @@ fn main() {
         .flag("-fsycl")
         .file("src/shim.cpp")
         .std("c++17")
-        .compile("test");
+        .compile("oneapi-shim");
 
-    println!("cargo:rerun-if-changed=src/test.cpp");
-    println!("cargo:rerun-if-changed=include/shim.hpp");
+    println!("cargo::rustc-link-lib=sycl");
+    println!("cargo::rerun-if-changed=include/shim.hpp");
+    println!("cargo::rerun-if-changed=include/shim.cpp");
 }
