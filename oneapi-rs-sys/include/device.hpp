@@ -9,6 +9,7 @@
 #pragma once
 
 #include "rust/cxx.h"
+#include "oneapi-rs-sys/include/platform.hpp"
 
 #include <sycl/sycl.hpp>
 
@@ -27,6 +28,7 @@ public:
   DeviceType get_device_type() const;
   rust::String get_version() const;
   rust::String get_name() const;
+  std::unique_ptr<Platform> get_platform() const;
 
 private:
   sycl::device inner;

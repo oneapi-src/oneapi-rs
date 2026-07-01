@@ -49,4 +49,8 @@ rust::String Device::get_version() const {
 rust::String Device::get_name() const {
   return this->inner.get_info<sycl::info::device::name>();
 }
+
+std::unique_ptr<Platform> Device::get_platform() const {
+  return std::make_unique<Platform>(this->inner.get_platform());
+}
 } // namespace sycl_shims

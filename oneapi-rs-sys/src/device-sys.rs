@@ -30,12 +30,15 @@ pub mod ffi {
         include!("oneapi-rs-sys/include/device.hpp");
  
         type Device;
+        type Platform = crate::platform::ffi::Platform;
 
         #[Self = "Device"]
         fn get_devices() -> Vec<DevicePtr>;
 
-        fn get_device_type(&self) -> DeviceType;
-        fn get_version(&self) -> String;
-        fn get_name(&self) -> String;
+        fn get_platform(self: &Device) -> UniquePtr<Platform>;
+
+        fn get_device_type(self: &Device) -> DeviceType;
+        fn get_version(self: &Device) -> String;
+        fn get_name(self: &Device) -> String;
     }
 }
