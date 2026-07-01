@@ -13,10 +13,10 @@ use crate::info::platform::PlatformInfo;
 pub struct Platform(pub(crate) cxx::UniquePtr<ffi::Platform>);
 
 impl Platform {
-    pub fn get_platforms() -> Vec<Platform> {
+    pub fn get_platforms() -> Vec<Self> {
         ffi::Platform::get_platforms()
             .into_iter()
-            .map(|platform| Platform(platform.ptr))
+            .map(|platform| Self(platform.ptr))
             .collect()
     }
 
