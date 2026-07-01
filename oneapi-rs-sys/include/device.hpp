@@ -25,6 +25,7 @@ public:
 
   static rust::Vec<DevicePtr> get_devices();
   DeviceType get_device_type() const;
+  rust::String get_version() const;
 
 private:
   sycl::device inner;

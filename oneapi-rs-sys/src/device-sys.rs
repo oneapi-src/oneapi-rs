@@ -35,5 +35,6 @@ pub mod ffi {
         fn get_devices() -> Vec<DevicePtr>;
 
         fn get_device_type(&self) -> DeviceType;
+        fn get_version(&self) -> String;
     }
 }
