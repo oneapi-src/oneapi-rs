@@ -15,6 +15,16 @@ pub mod ffi {
         ptr: UniquePtr<Device>
     }
 
+    enum DeviceType {
+        Cpu,
+        Gpu,
+        Accelerator,
+        Custom,
+        Automatic,
+        All,
+        Unimplemented
+    }
+
     unsafe extern "C++" {
         include!("oneapi-rs-sys/include/device.hpp");
  
@@ -22,5 +32,7 @@ pub mod ffi {
 
         #[Self = "Device"]
         fn get_devices() -> Vec<DevicePtr>;
+
+        fn get_device_type(&self) -> DeviceType;
     }
 }

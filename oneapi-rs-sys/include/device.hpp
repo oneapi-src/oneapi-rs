@@ -17,12 +17,14 @@
 
 namespace sycl_shims {
 struct DevicePtr;
+enum class DeviceType: std::uint8_t;
 
 class Device {
 public:
   Device(sycl::device p) : inner(p) {}
 
   static rust::Vec<DevicePtr> get_devices();
+  DeviceType get_device_type() const;
 
 private:
   sycl::device inner;
