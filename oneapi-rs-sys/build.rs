@@ -10,15 +10,23 @@ fn main() {
     let compiler_root = std::env::var("CMPLR_ROOT")
         .expect("No valid OneAPI installation found.");
 
-    cxx_build::bridges(&[
-            "src/platform-sys.rs"
-        ])
+    let rust_sources = [
+        "src/platform-sys.rs"
+    ];
+
+    let cpp_sources = [
+        "src/platform.cpp"
+    ];
+
+    let cpp_headers = [
+        "include/platform.hpp"
+    ];
+
+    cxx_build::bridges(&rust_sources)
         .compiler(format!("{compiler_root}/bin/icpx"))
         .include(format!("{compiler_root}/include"))
         .flag("-fsycl")
-        .files(&[
-            "src/platform.cpp"
-        ])
+        .files(&cpp_sources)
         .std("c++17")
         .compile("oneapi-shim");
 
@@ -26,6 +34,11 @@ fn main() {
     println!("cargo::rustc-link-lib=ze_loader");
     println!("cargo::rustc-link-lib=intlc");
 
-    println!("cargo::rerun-if-changed=include/shim.hpp");
-    println!("cargo::rerun-if-changed=include/shim.cpp");
+    for source in cpp_sources {
+        println!("cargo::rerun-if-changed={source}");
+    }
+
+    for header in cpp_headers {
+        println!("cargo::rerun-if-changed={header}");
+    }
 }
