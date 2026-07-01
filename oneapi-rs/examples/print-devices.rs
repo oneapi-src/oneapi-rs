@@ -7,7 +7,7 @@
 //
 
 use oneapi_rs::device::Device;
-use oneapi_rs::info::device::*;
+use oneapi_rs::info::{self, device::*};
 
 fn main() {
     for device in Device::get_devices() {
@@ -15,5 +15,6 @@ fn main() {
         println!("- Name: {}", device.get_info::<Name>());
         println!("- Version: {}", device.get_info::<Version>());
         println!("- Type: {:?}", device.get_info::<DeviceType>());
+        println!("- Platform name: {}", device.get_platform().get_info::<info::platform::Name>());
     }
 }
