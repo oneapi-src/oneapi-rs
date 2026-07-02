@@ -6,9 +6,12 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::{io::Error, path::PathBuf};
+use which::which;
+
 fn main() {
-    let compiler_root = std::env::var("CMPLR_ROOT")
-        .expect("No valid OneAPI installation found.");
+    let compiler_path = get_compiler_path()
+        .expect("Expecting a compiler. Set the ONEAPI_CXX environment variable.");
 
     let rust_sources = [
         "src/types-sys.rs",
@@ -28,8 +31,7 @@ fn main() {
     ];
 
     cxx_build::bridges(&rust_sources)
-        .compiler(format!("{compiler_root}/bin/icpx"))
-        .include(format!("{compiler_root}/include"))
+        .compiler(&compiler_path)
         .flag("-fsycl")
         .files(&cpp_sources)
         .std("c++17")
@@ -46,4 +48,30 @@ fn main() {
     for header in cpp_headers {
         println!("cargo::rerun-if-changed={header}");
     }
+}
+
+fn get_compiler_path() -> Result<PathBuf, Error> {
+    if let Ok(path) = std::env::var("ONEAPI_CXX") {
+        let path = PathBuf::from(path);
+        if path.exists() {
+            return Ok(path);
+        }
+    }
+    if let Ok(path) = std::env::var("CMPLR_ROOT") {
+        let path = PathBuf::from(path).join("bin/icpx");
+        if path.exists() {
+            return Ok(path)
+        }
+    }
+    if let Ok(path) = which("icpx") {
+        return Ok(path);
+    }
+    if let Ok(path) = which("dpcpp") {
+        return Ok(path);
+    }
+    if let Ok(path) = which("clang++") {
+        return Ok(path);
+    }
+
+    Err(Error::new(std::io::ErrorKind::NotFound, "No OneAPI compiler found"))
 }
