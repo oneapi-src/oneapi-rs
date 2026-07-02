@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "rust/cxx.h"
 #include "oneapi-rs-sys/include/opaque.hpp"
+#include "rust/cxx.h"
 
 #include <memory>
 #include <vector>
@@ -17,13 +17,13 @@
 namespace sycl_shims {
 struct DevicePtr;
 struct PlatformPtr;
-enum class DeviceType: std::uint8_t;
+enum class DeviceType : std::uint8_t;
 } // namespace sycl_shims
 
 namespace sycl_shims::device {
 rust::Vec<DevicePtr> get_devices();
-DeviceType get_device_type(Device const& device);
-rust::String get_version(Device const& device);
-rust::String get_name(Device const& device);
-std::unique_ptr<Platform> get_platform(Device const& device);
+DeviceType get_device_type(Device const &);
+rust::String get_version(Device const &);
+rust::String get_name(Device const &);
+std::unique_ptr<Platform> get_platform(Device const &);
 } // namespace sycl_shims::device
