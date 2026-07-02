@@ -19,6 +19,15 @@ rust::Vec<PlatformPtr> get_platforms() {
   return platforms;
 }
 
+rust::Vec<device::DevicePtr> get_devices(Platform const& platform) {
+  rust::Vec<device::DevicePtr> devices;
+
+  for (auto &&device : platform.get_devices())
+    devices.push_back(device::DevicePtr { std::make_unique<Device>(device) });
+
+  return devices;
+}
+
 rust::String get_version(Platform const& platform) {
   return platform.get_info<sycl::info::platform::version>();
 }

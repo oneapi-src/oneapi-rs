@@ -15,6 +15,16 @@ pub mod ffi {
         ptr: UniquePtr<Platform>
     }
 
+    // We're trying to import a DevicePtr defined in device-sys.rs.
+    // This syntax will be refactored in a further cxx pull request,
+    // see https://github.com/dtolnay/cxx/issues/297
+    // and https://github.com/dtolnay/cxx/issues/353
+    #[namespace = "sycl_shims::device"]
+    extern "C++" {
+        include!("oneapi-rs-sys/src/device-sys.rs.h");
+        type DevicePtr = crate::device::ffi::DevicePtr;
+    }
+
     unsafe extern "C++" {
         include!("oneapi-rs-sys/include/platform.hpp");
 
@@ -24,6 +34,8 @@ pub mod ffi {
         type Platform = crate::opaque::ffi::Platform;
 
         fn get_platforms() -> Vec<PlatformPtr>;
+
+        fn get_devices(platform: &Platform) -> Vec<DevicePtr>;
 
         fn get_version(platform: &Platform) -> String;
         fn get_name(platform: &Platform) -> String;
