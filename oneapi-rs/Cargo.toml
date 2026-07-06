@@ -7,3 +7,4 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 cxx = "1.0.194"
 oneapi-rs-sys = { path = "../oneapi-rs-sys" }
+thiserror = "2.0.18"
