@@ -11,3 +11,4 @@ pub mod platform;
 pub mod device;
 pub mod queue;
 pub mod usm;
+pub mod buffer;

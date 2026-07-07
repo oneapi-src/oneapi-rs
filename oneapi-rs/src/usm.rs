@@ -20,6 +20,10 @@ pub struct UsmAllocator<'a, T: UsmAllocatorKind> {
     _kind: PhantomData<T>
 }
 
+pub trait UsmAlloc : Allocator {}
+
+impl<'a, T: UsmAllocatorKind> UsmAlloc for UsmAllocator<'a, T> {}
+
 pub trait UsmAllocatorKind {
     unsafe fn alloc(alignment: usize, bytes: usize, queue: &Queue) -> CxxResult<*mut u8>;
 }
