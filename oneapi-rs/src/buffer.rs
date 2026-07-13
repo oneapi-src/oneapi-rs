@@ -18,7 +18,7 @@ pub struct Buffer<T, A: UsmAlloc> {
 }
 
 impl<T, A: UsmAlloc> Buffer<T, A> {
-    pub(crate) fn new(allocator: A, len: usize) -> Self {
+    pub(crate) unsafe fn new(allocator: A, len: usize) -> Self {
         let layout = Layout::array::<T>(len).unwrap();
         let ptr = match allocator.allocate(layout.clone()) {
             Ok(ptr) => ptr,

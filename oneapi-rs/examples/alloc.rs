@@ -10,7 +10,7 @@ use oneapi_rs::queue::Queue;
 
 fn main() {
     let queue = Queue::new();
-    let mut buffer = queue.alloc_shared::<u32>(10);
+    let mut buffer = unsafe { queue.alloc_uninit_shared::<u32>(10) };
 
     for i in 0..buffer.len() {
         buffer[i] = i as u32;
