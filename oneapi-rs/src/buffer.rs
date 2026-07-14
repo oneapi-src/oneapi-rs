@@ -13,12 +13,12 @@ use crate::usm::UsmAlloc;
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
 /// by the SYCL kernel. Buffers are templated on the type of their data, and the number of
 /// dimensions that the data is stored and accessed through.
-
+///
 /// A Buffer does not map to only one underlying backend object, and all SYCL backend memory objects
 /// may be temporary for use on a specific device.
-
+///
 /// Buffers can be constructed by methods provided by the [`Queue`](`crate::queue::Queue`) class.
-
+///
 /// The Buffer struct template takes a template parameter [`UsmAlloc`](`crate::usm::UsmAlloc`) for
 /// specifying an allocator which is used by the SYCL runtime when allocating temporary memory on
 /// the host.

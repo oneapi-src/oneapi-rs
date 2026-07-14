@@ -10,16 +10,16 @@
 #include "oneapi-rs-sys/src/usm-sys.rs.h"
 
 namespace sycl_shims::usm {
-std::uint8_t* aligned_alloc_device(std::size_t alignment, std::size_t bytes, Queue const & queue) {
-  return static_cast<std::uint8_t*>(sycl::aligned_alloc_device(alignment, bytes, queue));
+std::uint8_t* aligned_alloc_device(std::size_t alignment, std::size_t num_bytes, Queue const & queue) {
+  return static_cast<std::uint8_t*>(sycl::aligned_alloc_device(alignment, num_bytes, queue));
 }
 
-std::uint8_t* aligned_alloc_host(std::size_t alignment, std::size_t bytes, Queue const & queue) {
-  return static_cast<std::uint8_t*>(sycl::aligned_alloc_host(alignment, bytes, queue));
+std::uint8_t* aligned_alloc_host(std::size_t alignment, std::size_t num_bytes, Queue const & queue) {
+  return static_cast<std::uint8_t*>(sycl::aligned_alloc_host(alignment, num_bytes, queue));
 }
 
-std::uint8_t* aligned_alloc_shared(std::size_t alignment, std::size_t bytes, Queue const & queue) {
-  return static_cast<std::uint8_t*>(sycl::aligned_alloc_shared(alignment, bytes, queue));
+std::uint8_t* aligned_alloc_shared(std::size_t alignment, std::size_t num_bytes, Queue const & queue) {
+  return static_cast<std::uint8_t*>(sycl::aligned_alloc_shared(alignment, num_bytes, queue));
 }
 
 void free(std::uint8_t* memory, Queue const & queue) {

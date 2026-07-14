@@ -27,7 +27,7 @@ pub unsafe trait UsmAlloc : Allocator {}
 unsafe impl<'a, T: UsmAllocatorKind> UsmAlloc for UsmAllocator<'a, T> {}
 
 pub trait UsmAllocatorKind {
-    unsafe fn alloc(alignment: usize, bytes: usize, queue: &Queue) -> CxxResult<*mut u8>;
+    unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8>;
 }
 
 impl<'a, T: UsmAllocatorKind> From<&'a Queue> for UsmAllocator<'a, T> {
@@ -61,8 +61,8 @@ unsafe impl<T: UsmAllocatorKind> Allocator for UsmAllocator<'_, T> {
 pub(crate) struct DeviceAllocator;
 
 impl UsmAllocatorKind for DeviceAllocator {
-    unsafe fn alloc(alignment: usize, bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
-        unsafe { ffi::aligned_alloc_device(alignment, bytes, &queue.0) }
+    unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
+        unsafe { ffi::aligned_alloc_device(alignment, num_bytes, &queue.0) }
     }
 }
 
@@ -70,8 +70,8 @@ impl UsmAllocatorKind for DeviceAllocator {
 pub struct HostAllocator;
 
 impl UsmAllocatorKind for HostAllocator {
-    unsafe fn alloc(alignment: usize, bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
-        unsafe { ffi::aligned_alloc_host(alignment, bytes, &queue.0) }
+    unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
+        unsafe { ffi::aligned_alloc_host(alignment, num_bytes, &queue.0) }
     }
 }
 
@@ -79,7 +79,7 @@ impl UsmAllocatorKind for HostAllocator {
 pub struct SharedAllocator;
 
 impl UsmAllocatorKind for SharedAllocator {
-    unsafe fn alloc(alignment: usize, bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
-        unsafe { ffi::aligned_alloc_shared(alignment, bytes, &queue.0) }
+    unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
+        unsafe { ffi::aligned_alloc_shared(alignment, num_bytes, &queue.0) }
     }
 }
