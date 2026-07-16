@@ -6,6 +6,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+// cxx requires Rust opaque types to be defined in the current crate.
+pub struct Waker(pub std::task::Waker);
+
 #[cxx::bridge(namespace = "sycl_shims")]
 pub mod ffi {
     unsafe extern "C++" {

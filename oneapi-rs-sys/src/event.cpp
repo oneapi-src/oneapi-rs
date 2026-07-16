@@ -7,7 +7,6 @@
 //
 
 #include "oneapi-rs-sys/include/event.hpp"
-#include "oneapi-rs-sys/src/event-sys.rs.h"
 
 using sycl::info::event_command_status;
 
@@ -30,5 +29,11 @@ EventCommandStatus get_command_execution_status(Event const & event) {
     default:
       return EventCommandStatus::Unknown;
   }
+}
+void register_callback(Event const & event, rust::Box<Waker> waker) {
+  sycl::queue().submit([waker = std::move(waker), event](sycl::handler& cgh) {
+    cgh.depends_on(event);
+    cgh.host_task([&]() mutable { wake(waker); });
+  });
 }
 } // namespace sycl_shims::event

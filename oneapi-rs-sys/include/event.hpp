@@ -9,6 +9,7 @@
 #pragma once
 
 #include "oneapi-rs-sys/include/types.hpp"
+#include "oneapi-rs-sys/src/event-sys.rs.h"
 #include "rust/cxx.h"
 
 #include <memory>
@@ -19,6 +20,7 @@ enum class EventCommandStatus : std::uint8_t;
 
 namespace sycl_shims::event {
 void wait(std::unique_ptr<Event> &);
+void register_callback(Event const &, rust::Box<Waker>);
 EventCommandStatus get_command_execution_status(Event const &);
 std::unique_ptr<Event> clone(Event const &);
 } // namespace sycl_shims::event
