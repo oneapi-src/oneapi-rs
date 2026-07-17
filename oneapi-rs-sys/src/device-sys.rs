@@ -31,5 +31,6 @@ pub mod ffi {
         fn get_device_type(device: &Device) -> DeviceType;
         fn get_version(device: &Device) -> String;
         fn get_name(device: &Device) -> String;
+        fn clone(device: &Device) -> UniquePtr<Device>;
     }
 }
