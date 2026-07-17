@@ -8,13 +8,18 @@
 
 #pragma once
 
+#include "rust/cxx.h"
+#include "oneapi-rs-sys/include/types.hpp"
+
 #include <sycl/sycl.hpp>
 
+#include <memory>
+
 namespace sycl_shims {
-using Device = sycl::device;
-using Platform = sycl::platform;
-using Queue = sycl::queue;
-using Event = sycl::event;
-using Context = sycl::context;
+struct DevicePtr;
+struct ContextPtr;
 } // namespace sycl_shims
 
+namespace sycl_shims::context {
+std::unique_ptr<Context> new_context(rust::Vec<DevicePtr>);
+} // namespace sycl_shims::context

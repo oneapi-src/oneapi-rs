@@ -23,3 +23,6 @@ pub mod usm;
 
 #[path = "event-sys.rs"]
 pub mod event;
+
+#[path = "context-sys.rs"]
+pub mod context;

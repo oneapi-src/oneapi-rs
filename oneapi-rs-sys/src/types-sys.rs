@@ -37,6 +37,7 @@ pub mod ffi {
         type Platform;
         type Queue;
         type Event;
+        type Context;
     }
 
     // This is a workaround - cxx currently doesn't support passing
@@ -53,6 +54,10 @@ pub mod ffi {
 
     struct EventPtr {
         ptr: UniquePtr<Event>,
+    }
+
+    struct ContextPtr {
+        ptr: UniquePtr<Context>
     }
 
     #[derive(Debug)]
@@ -78,6 +83,7 @@ pub mod ffi {
     impl UniquePtr<Platform> {}
     impl UniquePtr<Queue> {}
     impl UniquePtr<Event> {}
+    impl UniquePtr<Context> {}
 
     impl Vec<DevicePtr> {}
     impl Vec<PlatformPtr> {}
