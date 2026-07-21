@@ -32,10 +32,10 @@ EventCommandStatus get_command_execution_status(Event const & event) {
       return EventCommandStatus::Unknown;
   }
 }
-void register_callback(std::unique_ptr<Queue> & queue, Event const & event, rust::Box<Waker> waker) {
-  queue->submit([waker = std::move(waker), event](sycl::handler& cgh) {
+void register_callback(std::unique_ptr<Queue> & queue, Event const & event, SharedWaker const * waker) {
+  queue->submit([=](sycl::handler& cgh) {
     cgh.depends_on(event);
-    cgh.host_task([&]() { wake(waker); });
+    cgh.host_task([=]() { waker->wake(); });
   });
 }
 } // namespace sycl_shims::event

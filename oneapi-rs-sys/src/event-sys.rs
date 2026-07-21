@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use crate::types::Waker;
+use crate::types::SharedWaker;
 
 #[cxx::bridge(namespace = "sycl_shims::event")]
 pub mod ffi {
@@ -26,17 +26,13 @@ pub mod ffi {
         type Queue = crate::types::ffi::Queue;
 
         fn wait(event: &mut UniquePtr<Event>);
-        fn register_callback(queue: &mut UniquePtr<Queue>, event: &Event, waker: Box<Waker>);
+        unsafe fn register_callback(queue: &mut UniquePtr<Queue>, event: &Event, waker: *const SharedWaker);
         fn get_command_execution_status(event: &Event) -> EventCommandStatus;
         fn clone(event: &Event) -> UniquePtr<Event>;
     }
 
     extern "Rust" {
-        type Waker;
-        fn wake(waker: &Box<Waker>);
+        type SharedWaker;
+        fn wake(&self);
     }
-}
-
-fn wake(waker: &Box<Waker>) {
-    waker.0.wake_by_ref();
 }

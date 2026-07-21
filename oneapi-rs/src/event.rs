@@ -6,13 +6,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use std::{pin::Pin, task::{Context, Poll}};
+use std::{pin::Pin, task::{Context, Poll}, sync::atomic::Ordering::Relaxed};
 
-use oneapi_rs_sys::event::ffi;
+use oneapi_rs_sys::{event::ffi, types::SharedWaker};
 
 use pin_project::pin_project;
 
-use crate::{info::{EventCommandStatus, event::{CommandExecutionStatus, EventInfo}}, queue::Queue};
+use crate::{info::event::EventInfo, queue::Queue};
 
 pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 
@@ -41,6 +41,7 @@ impl Clone for Event {
 #[pin_project]
 pub struct EventFuture {
     event: Event,
+    shared: SharedWaker,
     set_callback: bool,
     queue: Queue,
 }
@@ -49,17 +50,41 @@ impl Future for EventFuture {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        if self.event.get_info::<CommandExecutionStatus>() == EventCommandStatus::Complete {
-            Poll::Ready(())
+        let this = self.project();
+
+        // Set the callback on first Future poll (Futures can't be active until polled)
+        if *this.set_callback == false {
+            *this.set_callback = true;
+            this.shared.waker.register(cx.waker());
+            unsafe { ffi::register_callback(&mut this.queue.0, &this.event.0, this.shared) };
+
+            // Check the event again to avoid a race condition
+            // https://docs.rs/futures/latest/futures/task/struct.AtomicWaker.html#examples
+            if this.shared.done.load(Relaxed) {
+                Poll::Ready(())
+            }
+            else {
+                Poll::Pending
+            }
         }
         else {
-            if self.set_callback == false {
-                let this = self.project();
-                *this.set_callback = true;
-                let waker = Box::new(cx.waker().clone().into());
-                ffi::register_callback(&mut this.queue.0, &this.event.0, waker);
+            // Quick check before registering to avoid wasting time
+            if this.shared.done.load(Relaxed) {
+                return Poll::Ready(());
             }
-            Poll::Pending
+
+            // Register the waker if result isn't ready. This is a slow atomic operation
+            this.shared.waker.register(cx.waker());
+
+            // Check the event again to avoid a race condition
+            // https://docs.rs/futures/latest/futures/task/struct.AtomicWaker.html#examples
+            if this.shared.done.load(Relaxed) {
+                Poll::Ready(())
+            }
+            else {
+                Poll::Pending
+            }
+
         }
     }
 }
@@ -70,9 +95,10 @@ impl IntoFuture for Event {
 
     fn into_future(self) -> Self::IntoFuture {
         EventFuture {
-            queue: Queue::new_immediate(),
             event: self,
-            set_callback: false
+            shared: SharedWaker::new(),
+            set_callback: false,
+            queue: Queue::new_immediate(),
         }
     }
 }

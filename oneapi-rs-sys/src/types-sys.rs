@@ -6,11 +6,26 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-// cxx requires Rust opaque types to be defined in the current crate.
-pub struct Waker(pub std::task::Waker);
-impl From<std::task::Waker> for Waker {
-    fn from(value: std::task::Waker) -> Self {
-        Waker(value)
+use std::sync::atomic::{Ordering::Relaxed, AtomicBool};
+
+use futures::task::AtomicWaker;
+
+pub struct SharedWaker {
+    pub waker: AtomicWaker,
+    pub done: AtomicBool
+}
+
+impl SharedWaker {
+    pub fn new() -> Self {
+        Self {
+            waker: AtomicWaker::new(),
+            done: AtomicBool::new(false)
+        }
+    }
+
+    pub fn wake(&self) {
+        self.done.store(true, Relaxed);
+        self.waker.wake();
     }
 }
 
