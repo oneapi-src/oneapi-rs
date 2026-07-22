@@ -6,12 +6,26 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use oneapi_rs_sys::types;
+use oneapi_rs_sys::{kernel_bundle::ffi, types};
 
 pub struct SourceKernelBundle(pub(crate) cxx::UniquePtr<types::ffi::SourceKernelBundle>);
 
 impl From<cxx::UniquePtr<types::ffi::SourceKernelBundle>> for SourceKernelBundle {
     fn from(value: cxx::UniquePtr<types::ffi::SourceKernelBundle>) -> Self {
+        Self(value)
+    }
+}
+
+impl SourceKernelBundle {
+    pub fn build(&mut self) -> ExecutableKernelBundle {
+        ffi::build(&mut self.0).into()
+    }
+}
+
+pub struct ExecutableKernelBundle(pub(crate) cxx::UniquePtr<types::ffi::ExecutableKernelBundle>);
+
+impl From<cxx::UniquePtr<types::ffi::ExecutableKernelBundle>> for ExecutableKernelBundle {
+    fn from(value: cxx::UniquePtr<types::ffi::ExecutableKernelBundle>) -> Self {
         Self(value)
     }
 }
