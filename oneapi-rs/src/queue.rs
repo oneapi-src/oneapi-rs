@@ -10,10 +10,7 @@ use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
 use crate::{
-    buffer::{Buffer, EnqueuedBuffer},
-    device::Device,
-    event::Event,
-    usm::{HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
+    buffer::{Buffer, EnqueuedBuffer}, context::Context, device::Device, event::Event, usm::{HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
 };
 
 /// The `Queue` connects a host program to a single device. Programs submit tasks to a device via the
@@ -30,6 +27,11 @@ impl Queue {
     /// Construct an immediate `Queue` based on the device returned from the default selector.
     pub fn new_immediate() -> Self {
         Self(ffi::new_queue_immediate())
+    }
+
+    /// Returns the SYCL queue’s context.
+    pub fn get_context(&self) -> Context {
+        ffi::get_context(&self.0).into()
     }
 
     /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
