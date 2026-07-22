@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include "oneapi-rs-sys/include/types.hpp"
 #include "rust/cxx.h"
-
-#include <memory>
 
 namespace sycl_shims::usm {
 std::uint8_t *aligned_alloc_device(std::size_t alignment, std::size_t num_bytes,

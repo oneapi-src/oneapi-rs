@@ -8,11 +8,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include "oneapi-rs-sys/include/types.hpp"
 #include "rust/cxx.h"
-
-#include <memory>
-#include <vector>
 
 namespace sycl_shims {
 struct DevicePtr;

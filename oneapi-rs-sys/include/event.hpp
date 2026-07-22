@@ -8,11 +8,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "oneapi-rs-sys/include/types.hpp"
 #include "oneapi-rs-sys/src/event-sys.rs.h"
 #include "rust/cxx.h"
-
-#include <memory>
 
 namespace sycl_shims {
 enum class EventCommandStatus : std::uint8_t;
