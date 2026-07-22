@@ -9,8 +9,6 @@
 #include "oneapi-rs-sys/include/context.hpp"
 #include "oneapi-rs-sys/src/context-sys.rs.h"
 
-namespace syclexp = sycl::ext::oneapi::experimental;
-
 namespace sycl_shims::context {
 std::unique_ptr<Context> new_context(rust::Vec<DevicePtr> devices) {
   std::vector<sycl::device> raw_devices;

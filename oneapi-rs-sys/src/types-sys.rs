@@ -39,6 +39,7 @@ pub mod ffi {
         type Event;
         type Context;
         type SourceKernelBundle;
+        type ExecutableKernelBundle;
     }
 
     // This is a workaround - cxx currently doesn't support passing
@@ -82,6 +83,7 @@ pub mod ffi {
     impl UniquePtr<Event> {}
     impl UniquePtr<Context> {}
     impl UniquePtr<SourceKernelBundle> {}
+    impl UniquePtr<ExecutableKernelBundle> {}
 
     impl Vec<DevicePtr> {}
     impl Vec<PlatformPtr> {}

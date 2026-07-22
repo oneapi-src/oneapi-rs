@@ -16,7 +16,13 @@ pub mod ffi {
 
         #[namespace = "sycl_shims"]
         type SourceKernelBundle = crate::types::ffi::SourceKernelBundle;
+
+        #[namespace = "sycl_shims"]
+        type ExecutableKernelBundle = crate::types::ffi::ExecutableKernelBundle;
+
         fn create_kernel_bundle_from_source(ctxt: &Context, source: &str)
             -> UniquePtr<SourceKernelBundle>;
+
+        fn build(source: &mut UniquePtr<SourceKernelBundle>) -> UniquePtr<ExecutableKernelBundle>;
     }
 }

@@ -20,4 +20,8 @@ std::unique_ptr<SourceKernelBundle> create_kernel_bundle_from_source(Context con
       std::string(source)
     ));
 }
+
+std::unique_ptr<ExecutableKernelBundle> build(std::unique_ptr<SourceKernelBundle> &source) {
+  return std::make_unique<ExecutableKernelBundle>(syclexp::build(*source));
+}
 } // namespace sycl_shims::kernel_bundle
