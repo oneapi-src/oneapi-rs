@@ -22,11 +22,14 @@ pub mod ffi {
         #[namespace = "sycl_shims"]
         type Device = crate::types::ffi::Device;
         #[namespace = "sycl_shims"]
+        type Context = crate::types::ffi::Context;
+        #[namespace = "sycl_shims"]
         type Event = crate::types::ffi::Event;
 
         fn new_queue() -> UniquePtr<Queue>;
         fn new_queue_immediate() -> UniquePtr<Queue>;
         fn new_queue_from_device(device: &Device) -> UniquePtr<Queue>;
+        fn get_context(queue: &Queue) -> UniquePtr<Context>;
         fn clone(queue: &Queue) -> UniquePtr<Queue>;
         unsafe fn memset(
             queue: &mut UniquePtr<Queue>,
