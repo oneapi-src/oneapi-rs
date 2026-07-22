@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use bytemuck::Pod;
 use oneapi_rs_sys::{kernel_bundle::ffi, types};
 
 pub struct SourceKernelBundle(pub(crate) cxx::UniquePtr<types::ffi::SourceKernelBundle>);
@@ -27,5 +28,15 @@ pub struct ExecutableKernelBundle(pub(crate) cxx::UniquePtr<types::ffi::Executab
 impl From<cxx::UniquePtr<types::ffi::ExecutableKernelBundle>> for ExecutableKernelBundle {
     fn from(value: cxx::UniquePtr<types::ffi::ExecutableKernelBundle>) -> Self {
         Self(value)
+    }
+}
+
+pub unsafe trait KernelArgument {
+    unsafe fn as_raw_arg(&self) -> &[u8];
+}
+
+unsafe impl<T: Pod> KernelArgument for T {
+    unsafe fn as_raw_arg(&self) -> &[u8] {
+        bytemuck::bytes_of(self)
     }
 }

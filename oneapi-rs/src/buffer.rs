@@ -15,11 +15,11 @@ use std::{
     task::{Context, Poll},
 };
 
+use bytemuck::Pod;
 use pin_project::pin_project;
 
 use crate::{
-    event::{Event, EventFuture},
-    usm::UsmAlloc,
+    event::{Event, EventFuture}, kernel_bundle::KernelArgument, usm::UsmAlloc,
 };
 
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
@@ -135,6 +135,17 @@ impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
         Self::IntoFuture {
             buffer: Some(self.buffer),
             event_future: self.event.into_future(),
+        }
+    }
+}
+
+unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
+    unsafe fn as_raw_arg(&self) -> &[u8] {
+        unsafe {
+            slice::from_raw_parts(
+                self.data.as_ptr() as *mut u8, 
+                std::mem::size_of::<*mut u8>()
+            )
         }
     }
 }
