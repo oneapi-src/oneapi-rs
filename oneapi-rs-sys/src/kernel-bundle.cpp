@@ -24,4 +24,8 @@ std::unique_ptr<SourceKernelBundle> create_kernel_bundle_from_source(Context con
 std::unique_ptr<ExecutableKernelBundle> build(std::unique_ptr<SourceKernelBundle> &source) {
   return std::make_unique<ExecutableKernelBundle>(syclexp::build(*source));
 }
+
+std::unique_ptr<Kernel> get_kernel(std::unique_ptr<ExecutableKernelBundle> &bundle, rust::Str name) {
+  return std::make_unique<Kernel>(bundle->ext_oneapi_get_kernel(static_cast<std::string const&>(name)));
+}
 } // namespace sycl_shims::kernel_bundle

@@ -85,6 +85,7 @@ pub mod ffi {
     impl UniquePtr<Context> {}
     impl UniquePtr<SourceKernelBundle> {}
     impl UniquePtr<ExecutableKernelBundle> {}
+    impl UniquePtr<Kernel> {}
 
     impl Vec<DevicePtr> {}
     impl Vec<PlatformPtr> {}
