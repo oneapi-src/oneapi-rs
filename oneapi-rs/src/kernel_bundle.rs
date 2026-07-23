@@ -31,6 +31,20 @@ impl From<cxx::UniquePtr<types::ffi::ExecutableKernelBundle>> for ExecutableKern
     }
 }
 
+impl ExecutableKernelBundle {
+    pub fn get_kernel(&mut self, name: &str) -> Kernel {
+        ffi::get_kernel(&mut self.0, name).into()
+    }
+}
+
+pub struct Kernel(pub(crate) cxx::UniquePtr<types::ffi::Kernel>);
+
+impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
+    fn from(value: cxx::UniquePtr<types::ffi::Kernel>) -> Self {
+        Self(value)
+    }
+}
+
 pub unsafe trait KernelArgument {
     unsafe fn as_raw_arg(&self) -> &[u8];
 }
