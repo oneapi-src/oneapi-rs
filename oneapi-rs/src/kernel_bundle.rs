@@ -61,65 +61,99 @@ pub unsafe trait KernelArgumentList<const ARGC: usize> {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
 
-
 pub type Range<const DIMENSIONS: usize = 1> = [u64; DIMENSIONS];
 
 pub struct NdRange<const DIMENSIONS: usize = 1> {
     pub group_size: Range<DIMENSIONS>,
-    pub local_size: Range<DIMENSIONS>
+    pub local_size: Range<DIMENSIONS>,
 }
 
 impl<const DIMENSIONS: usize> NdRange<DIMENSIONS> {
     pub fn new(group_size: Range<DIMENSIONS>, local_size: Range<DIMENSIONS>) -> Self {
         Self {
             group_size,
-            local_size
+            local_size,
         }
     }
 }
 
 pub trait ValidDimension {
-    unsafe fn launch<const ARGC: usize>(&self, queue: &mut Queue, kernel: &Kernel, args: impl KernelArgumentList<ARGC>) -> Event;
+    unsafe fn launch<const ARGC: usize>(
+        &self,
+        queue: &mut Queue,
+        kernel: &Kernel,
+        args: impl KernelArgumentList<ARGC>,
+    ) -> Event;
 }
 
 impl ValidDimension for NdRange<1> {
-    unsafe fn launch<const ARGC: usize>(&self, queue: &mut Queue, kernel: &Kernel, args: impl KernelArgumentList<ARGC>) -> Event {
+    unsafe fn launch<const ARGC: usize>(
+        &self,
+        queue: &mut Queue,
+        kernel: &Kernel,
+        args: impl KernelArgumentList<ARGC>,
+    ) -> Event {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_1d(
                 &mut queue.0,
-                types::ffi::Range1 { data: self.group_size },
-                types::ffi::Range1 { data: self.local_size },
+                types::ffi::Range1 {
+                    data: self.group_size,
+                },
+                types::ffi::Range1 {
+                    data: self.local_size,
+                },
                 &kernel.0,
-                &args.as_raw_arg_list()
+                &args.as_raw_arg_list(),
             )
-        }.into()
+        }
+        .into()
     }
 }
 
 impl ValidDimension for NdRange<2> {
-    unsafe fn launch<const ARGC: usize>(&self, queue: &mut Queue, kernel: &Kernel, args: impl KernelArgumentList<ARGC>) -> Event {
+    unsafe fn launch<const ARGC: usize>(
+        &self,
+        queue: &mut Queue,
+        kernel: &Kernel,
+        args: impl KernelArgumentList<ARGC>,
+    ) -> Event {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_2d(
                 &mut queue.0,
-                types::ffi::Range2 { data: self.group_size },
-                types::ffi::Range2 { data: self.local_size },
+                types::ffi::Range2 {
+                    data: self.group_size,
+                },
+                types::ffi::Range2 {
+                    data: self.local_size,
+                },
                 &kernel.0,
-                &args.as_raw_arg_list()
+                &args.as_raw_arg_list(),
             )
-        }.into()
+        }
+        .into()
     }
 }
 
 impl ValidDimension for NdRange<3> {
-    unsafe fn launch<const ARGC: usize>(&self, queue: &mut Queue, kernel: &Kernel, args: impl KernelArgumentList<ARGC>) -> Event {
+    unsafe fn launch<const ARGC: usize>(
+        &self,
+        queue: &mut Queue,
+        kernel: &Kernel,
+        args: impl KernelArgumentList<ARGC>,
+    ) -> Event {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_3d(
                 &mut queue.0,
-                types::ffi::Range3 { data: self.group_size },
-                types::ffi::Range3 { data: self.local_size },
+                types::ffi::Range3 {
+                    data: self.group_size,
+                },
+                types::ffi::Range3 {
+                    data: self.local_size,
+                },
                 &kernel.0,
-                &args.as_raw_arg_list()
+                &args.as_raw_arg_list(),
             )
-        }.into()
+        }
+        .into()
     }
 }

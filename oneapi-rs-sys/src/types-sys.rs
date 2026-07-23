@@ -80,15 +80,15 @@ pub mod ffi {
 
     // cxx doesn't support const generic parameters
     struct Range1 {
-        data: [u64; 1]
+        data: [u64; 1],
     }
 
     struct Range2 {
-        data: [u64; 2]
+        data: [u64; 2],
     }
 
     struct Range3 {
-        data: [u64; 3]
+        data: [u64; 3],
     }
 
     impl UniquePtr<Device> {}

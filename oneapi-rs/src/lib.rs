@@ -7,12 +7,11 @@
 //
 
 pub mod buffer;
+pub mod context;
 pub mod device;
 pub mod event;
 pub mod info;
+pub mod kernel_bundle;
 pub mod platform;
 pub mod queue;
 pub mod usm;
-pub mod context;
-pub mod kernel_bundle;
-

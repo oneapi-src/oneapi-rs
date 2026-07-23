@@ -19,7 +19,9 @@ use bytemuck::Pod;
 use pin_project::pin_project;
 
 use crate::{
-    event::{Event, EventFuture}, kernel_bundle::KernelArgument, usm::UsmAlloc,
+    event::{Event, EventFuture},
+    kernel_bundle::KernelArgument,
+    usm::UsmAlloc,
 };
 
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
@@ -143,11 +145,6 @@ unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
     unsafe fn as_raw_arg(&self) -> &[u8] {
         let data_ptr: *const NonNull<_> = &self.data;
         let cast_ptr = data_ptr as *const u8;
-        unsafe {
-            slice::from_raw_parts(
-                cast_ptr, 
-                std::mem::size_of::<*mut u8>()
-            )
-        }
+        unsafe { slice::from_raw_parts(cast_ptr, std::mem::size_of::<*mut u8>()) }
     }
 }

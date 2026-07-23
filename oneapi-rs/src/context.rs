@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use oneapi_rs_sys::{kernel_bundle, context::ffi, types::ffi::DevicePtr};
+use oneapi_rs_sys::{context::ffi, kernel_bundle, types::ffi::DevicePtr};
 
 use crate::{device::Device, kernel_bundle::SourceKernelBundle};
 
@@ -24,7 +24,9 @@ impl Context {
     pub fn new(devices: &[&Device]) -> Self {
         let devices = devices
             .iter()
-            .map(|d| DevicePtr { ptr: (*d).clone().0 })
+            .map(|d| DevicePtr {
+                ptr: (*d).clone().0,
+            })
             .collect::<Vec<_>>();
 
         ffi::new_context(devices).into()
