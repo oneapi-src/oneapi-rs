@@ -25,6 +25,8 @@ pub mod ffi {
         type Context = crate::types::ffi::Context;
         #[namespace = "sycl_shims"]
         type Event = crate::types::ffi::Event;
+        #[namespace = "sycl_shims"]
+        type Kernel = crate::types::ffi::Kernel;
 
         fn new_queue() -> UniquePtr<Queue>;
         fn new_queue_immediate() -> UniquePtr<Queue>;

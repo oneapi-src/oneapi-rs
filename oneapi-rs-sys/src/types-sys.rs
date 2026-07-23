@@ -38,6 +38,7 @@ pub mod ffi {
         type Queue;
         type Event;
         type Context;
+        type Kernel;
         type SourceKernelBundle;
         type ExecutableKernelBundle;
     }
