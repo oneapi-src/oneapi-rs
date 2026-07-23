@@ -12,6 +12,7 @@ pub mod ffi {
     extern "C++" {
         include!("oneapi-rs-sys/src/types-sys.rs.h");
         type EventPtr = crate::types::ffi::EventPtr;
+        type Range1 = crate::types::ffi::Range1;
         type Range2 = crate::types::ffi::Range2;
         type Range3 = crate::types::ffi::Range3;
     }
@@ -49,8 +50,8 @@ pub mod ffi {
 
         unsafe fn launch_1d(
             queue: &mut UniquePtr<Queue>,
-            global_size: u64,
-            local_size: u64,
+            global_size: Range1,
+            local_size: Range1,
             kernel: &Kernel,
             args: &[&[u8]],
         ) -> UniquePtr<Event>;

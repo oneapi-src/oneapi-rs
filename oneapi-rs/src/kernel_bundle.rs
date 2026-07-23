@@ -6,8 +6,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use std::marker::PhantomData;
-
 use bytemuck::Pod;
 use oneapi_rs_sys::{kernel_bundle::ffi, types};
 
@@ -89,8 +87,8 @@ impl ValidDimension for NdRange<1> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_1d(
                 &mut queue.0,
-                self.group_size[0],
-                self.local_size[0],
+                types::ffi::Range1 { data: self.group_size },
+                types::ffi::Range1 { data: self.local_size },
                 &kernel.0,
                 &args.as_raw_arg_list()
             )
@@ -103,14 +101,8 @@ impl ValidDimension for NdRange<2> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_2d(
                 &mut queue.0,
-                types::ffi::Range2 {
-                    x: self.group_size[0],
-                    y: self.group_size[1],
-                },
-                types::ffi::Range2 {
-                    x: self.local_size[0],
-                    y: self.local_size[1],
-                },
+                types::ffi::Range2 { data: self.group_size },
+                types::ffi::Range2 { data: self.local_size },
                 &kernel.0,
                 &args.as_raw_arg_list()
             )
@@ -123,16 +115,8 @@ impl ValidDimension for NdRange<3> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_3d(
                 &mut queue.0,
-                types::ffi::Range3 {
-                    x: self.group_size[0],
-                    y: self.group_size[1],
-                    z: self.group_size[2],
-                },
-                types::ffi::Range3 {
-                    x: self.local_size[0],
-                    y: self.local_size[1],
-                    z: self.local_size[2],
-                },
+                types::ffi::Range3 { data: self.group_size },
+                types::ffi::Range3 { data: self.local_size },
                 &kernel.0,
                 &args.as_raw_arg_list()
             )

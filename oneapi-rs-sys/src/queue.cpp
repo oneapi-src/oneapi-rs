@@ -69,11 +69,12 @@ launch(std::unique_ptr<Queue> &queue, sycl::nd_range<Dimensions> nd_range,
 }
 
 std::unique_ptr<Event>
-launch_1d(std::unique_ptr<Queue> &queue, unsigned long global_size,
-          unsigned long local_size, Kernel const &kernel,
+launch_1d(std::unique_ptr<Queue> &queue, Range1 global_size, Range1 local_size,
+          Kernel const &kernel,
           rust::Slice<rust::slice<std::uint8_t const> const> args) {
-  return launch(queue, sycl::nd_range<1>{{global_size}, {local_size}}, kernel,
-                args);
+  return launch(queue,
+                sycl::nd_range<1>{{global_size.data[0]}, {local_size.data[0]}},
+                kernel, args);
 }
 
 std::unique_ptr<Event>
@@ -81,8 +82,8 @@ launch_2d(std::unique_ptr<Queue> &queue, Range2 global_size, Range2 local_size,
           Kernel const &kernel,
           rust::Slice<rust::slice<std::uint8_t const> const> args) {
   return launch(queue,
-                sycl::nd_range<2>{{global_size.x, global_size.y},
-                                  {local_size.x, local_size.y}},
+                sycl::nd_range<2>{{global_size.data[0], global_size.data[1]},
+                                  {local_size.data[0], local_size.data[1]}},
                 kernel, args);
 }
 
@@ -90,9 +91,11 @@ std::unique_ptr<Event>
 launch_3d(std::unique_ptr<Queue> &queue, Range3 global_size, Range3 local_size,
           Kernel const &kernel,
           rust::Slice<rust::slice<std::uint8_t const> const> args) {
-  return launch(queue,
-                sycl::nd_range<3>{{global_size.x, global_size.y, global_size.z},
-                                  {local_size.x, local_size.y, local_size.z}},
-                kernel, args);
+  return launch(
+      queue,
+      sycl::nd_range<3>{
+          {global_size.data[0], global_size.data[1], global_size.data[2]},
+          {local_size.data[0], local_size.data[1], local_size.data[2]}},
+      kernel, args);
 }
 } // namespace sycl_shims::queue

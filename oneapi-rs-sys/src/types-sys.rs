@@ -77,16 +77,18 @@ pub mod ffi {
         Complete,
         Unknown,
     }
-    
+
+    // cxx doesn't support const generic parameters
+    struct Range1 {
+        data: [u64; 1]
+    }
+
     struct Range2 {
-        x: u64,
-        y: u64,
+        data: [u64; 2]
     }
 
     struct Range3 {
-        x: u64,
-        y: u64,
-        z: u64,
+        data: [u64; 3]
     }
 
     impl UniquePtr<Device> {}
