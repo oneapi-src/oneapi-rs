@@ -53,4 +53,8 @@ rust::String get_name(Device const &device) {
 std::unique_ptr<Platform> get_platform(Device const &device) {
   return std::make_unique<Platform>(device.get_platform());
 }
+
+std::unique_ptr<Device> clone(Device const &device) {
+  return std::make_unique<Device>(sycl::device(device));
+}
 } // namespace sycl_shims::device

@@ -11,8 +11,11 @@ use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
 use crate::{
     buffer::{Buffer, EnqueuedBuffer},
+    context::Context,
     device::Device,
     event::Event,
+    kernel::{Kernel, KernelArgumentList},
+    range::{NdRange, ValidDimension},
     usm::{HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
 };
 
@@ -30,6 +33,11 @@ impl Queue {
     /// Construct an immediate `Queue` based on the device returned from the default selector.
     pub fn new_immediate() -> Self {
         Self(ffi::new_queue_immediate())
+    }
+
+    /// Returns the SYCL queue’s context.
+    pub fn get_context(&self) -> Context {
+        ffi::get_context(&self.0).into()
     }
 
     /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
@@ -124,6 +132,20 @@ impl Queue {
     /// Performs a blocking wait for the completion of all enqueued tasks in the queue.
     pub fn wait(&mut self) {
         ffi::wait(&mut self.0);
+    }
+
+    /// Enqueues a kernel object to the queue an an ND-range kernel, using the number of work-items
+    /// specified by the [`NdRange`] nd_range.
+    pub unsafe fn launch<const ARGC: usize, const DIMENSIONS: usize>(
+        &mut self,
+        nd_range: NdRange<DIMENSIONS>,
+        kernel: &Kernel,
+        args: impl KernelArgumentList<ARGC>,
+    ) -> Event
+    where
+        NdRange<DIMENSIONS>: ValidDimension,
+    {
+        unsafe { nd_range.launch(self, kernel, args) }
     }
 }
 

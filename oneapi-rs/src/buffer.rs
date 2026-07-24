@@ -15,10 +15,12 @@ use std::{
     task::{Context, Poll},
 };
 
+use bytemuck::Pod;
 use pin_project::pin_project;
 
 use crate::{
     event::{Event, EventFuture},
+    kernel::KernelArgument,
     usm::UsmAlloc,
 };
 
@@ -136,5 +138,13 @@ impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
             buffer: Some(self.buffer),
             event_future: self.event.into_future(),
         }
+    }
+}
+
+unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
+    unsafe fn as_raw_arg(&self) -> &[u8] {
+        let data_ptr: *const NonNull<_> = &self.data;
+        let cast_ptr = data_ptr as *const u8;
+        unsafe { slice::from_raw_parts(cast_ptr, std::mem::size_of::<*mut u8>()) }
     }
 }

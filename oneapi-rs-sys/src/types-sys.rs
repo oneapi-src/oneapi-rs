@@ -37,6 +37,10 @@ pub mod ffi {
         type Platform;
         type Queue;
         type Event;
+        type Context;
+        type Kernel;
+        type SourceKernelBundle;
+        type ExecutableKernelBundle;
     }
 
     // This is a workaround - cxx currently doesn't support passing
@@ -74,10 +78,27 @@ pub mod ffi {
         Unknown,
     }
 
+    // cxx doesn't support const generic parameters
+    struct Range1 {
+        data: [u64; 1],
+    }
+
+    struct Range2 {
+        data: [u64; 2],
+    }
+
+    struct Range3 {
+        data: [u64; 3],
+    }
+
     impl UniquePtr<Device> {}
     impl UniquePtr<Platform> {}
     impl UniquePtr<Queue> {}
     impl UniquePtr<Event> {}
+    impl UniquePtr<Context> {}
+    impl UniquePtr<SourceKernelBundle> {}
+    impl UniquePtr<ExecutableKernelBundle> {}
+    impl UniquePtr<Kernel> {}
 
     impl Vec<DevicePtr> {}
     impl Vec<PlatformPtr> {}

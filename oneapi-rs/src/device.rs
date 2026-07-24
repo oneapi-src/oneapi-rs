@@ -15,6 +15,12 @@ use crate::{info::device::DeviceInfo, platform::Platform};
 /// The `Device` struct provides the common reference semantics.
 pub struct Device(pub(crate) cxx::UniquePtr<ffi::Device>);
 
+impl From<cxx::UniquePtr<ffi::Device>> for Device {
+    fn from(value: cxx::UniquePtr<ffi::Device>) -> Self {
+        Self(value)
+    }
+}
+
 impl Device {
     /// Returns a [`Vec`] containing all the root devices from all SYCL backends
     /// available in the system which have the device type encapsulated by [`DeviceType`](crate::info::DeviceType).
@@ -37,5 +43,11 @@ impl Device {
     pub fn get_platform(&self) -> Platform {
         let raw_platform = ffi::get_platform(&self.0);
         Platform(raw_platform)
+    }
+}
+
+impl Clone for Device {
+    fn clone(&self) -> Self {
+        ffi::clone(&self.0).into()
     }
 }
