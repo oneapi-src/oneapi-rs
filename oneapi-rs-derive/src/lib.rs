@@ -50,7 +50,7 @@ pub fn impl_arg_list_for_tuples(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as LitInt);
     let argc = input.base10_parse::<usize>().unwrap();
 
-    let impls = {2..argc}.map(get_single_tuple_impl);
+    let impls = {2..=argc}.map(get_single_tuple_impl);
 
     let expanded = quote! {
         #(#impls)*
