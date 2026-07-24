@@ -65,3 +65,7 @@ pub unsafe trait KernelArgumentList<const ARGC: usize> {
 }
 
 pub use oneapi_rs_derive::KernelArgumentList;
+
+use oneapi_rs_derive::impl_arg_list_for_tuples;
+
+impl_arg_list_for_tuples!{16}
