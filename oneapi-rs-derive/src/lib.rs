@@ -1,14 +1,15 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
-use syn::{Data, DeriveInput, LitInt, parse_macro_input};
+use syn::{Data, DataStruct, DeriveInput, Field, LitInt, WhereClause, parse_macro_input, parse_quote};
 
 #[proc_macro_derive(KernelArgumentList)]
 pub fn my_macro(input: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(input as DeriveInput);
+    let mut input = parse_macro_input!(input as DeriveInput);
 
+    let Data::Struct(data) = &input.data else { panic!() };
+    expand_where_clause(input.generics.make_where_clause(), data);
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
-    let Data::Struct(data) = input.data else { panic!() };
     let ident = input.ident;
     let argc = data.fields.len();
     let members = data.fields.members();
@@ -22,6 +23,12 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
+}
+
+fn expand_where_clause(where_clause: &mut WhereClause, data: &DataStruct) {
+    for Field { ty, .. } in &data.fields {
+        where_clause.predicates.push(parse_quote!(#ty: oneapi_rs::kernel::KernelArgument));
+    }
 }
 
 fn get_single_tuple_impl(argc: usize) -> proc_macro2::TokenStream {
