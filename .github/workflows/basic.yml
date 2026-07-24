@@ -54,7 +54,20 @@ jobs:
         printenv | grep -E '^(PATH|LD_LIBRARY_PATH|LIBRARY_PATH|CPATH|C_INCLUDE_PATH|CPLUS_INCLUDE_PATH)=' >> $GITHUB_ENV
         icx --version
         sycl-ls --verbose
-    
+
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes clang-format
+
+    - name: Check C++ formatting
+      run: |
+        git ls-files -z -- ':(glob)**/*.cpp' ':(glob)**/*.hpp' ':(glob)**/*.h' \
+          | xargs -0 --no-run-if-empty clang-format --dry-run --Werror
+
     - name: Build
       run: cargo build --verbose
 
