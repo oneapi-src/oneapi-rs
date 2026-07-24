@@ -1,7 +1,8 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
-    Data, DataStruct, DeriveInput, Field, LitInt, WhereClause, parse_macro_input, parse_quote,
+    Data, DataStruct, DeriveInput, Error, Field, LitInt, WhereClause, parse_macro_input,
+    parse_quote,
 };
 
 #[proc_macro_derive(KernelArgumentList)]
@@ -9,7 +10,9 @@ pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as DeriveInput);
 
     let Data::Struct(data) = &input.data else {
-        panic!()
+        return Error::new_spanned(input, "This derive macro only works on structs.")
+            .into_compile_error()
+            .into();
     };
     expand_where_clause(input.generics.make_where_clause(), data);
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
@@ -19,7 +22,8 @@ pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let members = data.fields.members();
 
     let expanded = quote! {
-        unsafe impl #impl_generics oneapi_rs::kernel::KernelArgumentList<#argc> for #ident #ty_generics #where_clause {
+        unsafe impl #impl_generics oneapi_rs::kernel::KernelArgumentList<#argc>
+        for #ident #ty_generics #where_clause {
             unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
                 [ #(unsafe { self.#members.as_raw_arg() }),* ]
             }
