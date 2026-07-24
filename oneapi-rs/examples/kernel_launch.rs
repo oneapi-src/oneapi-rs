@@ -27,17 +27,10 @@ void iota(float start, float *ptr) {
 }
 "#;
 
+#[derive(KernelArgumentList)]
 struct IotaArgs<'a> {
     start: f32,
     buffer: &'a mut Buffer<f32, UsmAllocator<SharedAllocator>>,
-}
-
-unsafe impl<'a> KernelArgumentList<2> for IotaArgs<'a> {
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 2] {
-        return [unsafe { self.start.as_raw_arg() }, unsafe {
-            self.buffer.as_raw_arg()
-        }];
-    }
 }
 
 fn main() {

@@ -63,3 +63,5 @@ unsafe impl<T: Pod> KernelArgument for T {
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
+
+pub use oneapi_rs_derive::KernelArgumentList;
