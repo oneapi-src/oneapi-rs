@@ -64,6 +64,12 @@ pub unsafe trait KernelArgumentList<const ARGC: usize> {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
 
+unsafe impl<T: KernelArgument> KernelArgumentList<1> for T {
+    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 1] {
+        [ unsafe { self.as_raw_arg() } ]
+    }
+}
+
 pub use oneapi_rs_derive::KernelArgumentList;
 
 use oneapi_rs_derive::impl_arg_list_for_tuples;
