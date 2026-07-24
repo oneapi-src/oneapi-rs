@@ -3,7 +3,7 @@ use quote::{format_ident, quote};
 use syn::{Data, DataStruct, DeriveInput, Field, LitInt, WhereClause, parse_macro_input, parse_quote};
 
 #[proc_macro_derive(KernelArgumentList)]
-pub fn my_macro(input: TokenStream) -> TokenStream {
+pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as DeriveInput);
 
     let Data::Struct(data) = &input.data else { panic!() };
