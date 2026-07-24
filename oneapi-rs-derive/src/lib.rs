@@ -15,7 +15,7 @@ pub fn my_macro(input: TokenStream) -> TokenStream {
     let members = data.fields.members();
 
     let expanded = quote! {
-        unsafe impl #impl_generics KernelArgumentList<#argc> for #ident #ty_generics #where_clause {
+        unsafe impl #impl_generics oneapi_rs::kernel::KernelArgumentList<#argc> for #ident #ty_generics #where_clause {
             unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
                 [ #(unsafe { self.#members.as_raw_arg() }),* ]
             }
@@ -36,8 +36,8 @@ fn get_single_tuple_impl(argc: usize) -> proc_macro2::TokenStream {
     let types = {0..argc}.map(|i| format_ident!("T{i}")).collect::<Vec<_>>();
 
     quote! {
-        unsafe impl<#(#types),*> KernelArgumentList<#argc> for (#(#types),*)
-        where #(#types: KernelArgument),* {
+        unsafe impl<#(#types),*> crate::kernel::KernelArgumentList<#argc> for (#(#types),*)
+        where #(#types: crate::kernel::KernelArgument),* {
             unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
                 [ #(unsafe { self.#iter.as_raw_arg() }),* ]
             }
