@@ -6,10 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use oneapi_rs::{
-    queue::Queue,
-    range::NdRange,
-};
+use oneapi_rs::{queue::Queue, range::NdRange};
 
 static IOTA_SRC: &str = r#"
 #include <sycl/sycl.hpp>
