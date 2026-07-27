@@ -20,6 +20,8 @@ fn main() {
         "src/queue-sys.rs",
         "src/usm-sys.rs",
         "src/event-sys.rs",
+        "src/context-sys.rs",
+        "src/kernel-bundle-sys.rs",
     ];
 
     let cpp_sources = [
@@ -28,6 +30,8 @@ fn main() {
         "src/queue.cpp",
         "src/usm.cpp",
         "src/event.cpp",
+        "src/context.cpp",
+        "src/kernel-bundle.cpp",
     ];
 
     let cpp_headers = [
@@ -37,6 +41,8 @@ fn main() {
         "include/queue.hpp",
         "include/usm.hpp",
         "include/event.hpp",
+        "include/context.hpp",
+        "include/kernel-bundle.hpp",
     ];
 
     cxx_build::bridges(&rust_sources)

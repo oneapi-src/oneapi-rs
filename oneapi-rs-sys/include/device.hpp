@@ -25,4 +25,5 @@ DeviceType get_device_type(Device const &);
 rust::String get_version(Device const &);
 rust::String get_name(Device const &);
 std::unique_ptr<Platform> get_platform(Device const &);
+std::unique_ptr<Device> clone(Device const &);
 } // namespace sycl_shims::device
