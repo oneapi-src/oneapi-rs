@@ -1,21 +1,32 @@
 use proc_macro::TokenStream;
+use proc_macro_crate::{FoundCrate, crate_name};
 use quote::{format_ident, quote};
 use syn::{
-    Data, DataStruct, DeriveInput, Error, Field, LitInt, WhereClause, parse_macro_input,
+    Data, DataStruct, DeriveInput, Error, Field, Ident, LitInt, WhereClause, parse_macro_input,
     parse_quote,
 };
+
+fn find_oneapi() -> Ident {
+    let crate_name =
+        crate_name("oneapi-rs").expect("Expected oneapi-rs to be present in Cargo.toml");
+    match crate_name {
+        FoundCrate::Itself => format_ident!("oneapi_rs"),
+        FoundCrate::Name(name) => format_ident!("{name}"),
+    }
+}
 
 /// Derive macro generating an impl of the `KernelArgumentList` trait for a given struct.
 #[proc_macro_derive(KernelArgumentList)]
 pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as DeriveInput);
+    let oneapi = find_oneapi();
 
     let Data::Struct(data) = &input.data else {
         return Error::new_spanned(input, "This derive macro only works on structs.")
             .into_compile_error()
             .into();
     };
-    expand_where_clause(input.generics.make_where_clause(), data);
+    expand_where_clause(input.generics.make_where_clause(), data, &oneapi);
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
     let ident = input.ident;
@@ -23,7 +34,7 @@ pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let members = data.fields.members();
 
     let expanded = quote! {
-        unsafe impl #impl_generics oneapi_rs::kernel::KernelArgumentList<#argc>
+        unsafe impl #impl_generics #oneapi::kernel::KernelArgumentList<#argc>
         for #ident #ty_generics #where_clause {
             unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
                 [ #(unsafe { self.#members.as_raw_arg() }),* ]
@@ -34,11 +45,11 @@ pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-fn expand_where_clause(where_clause: &mut WhereClause, data: &DataStruct) {
+fn expand_where_clause(where_clause: &mut WhereClause, data: &DataStruct, oneapi: &Ident) {
     for Field { ty, .. } in &data.fields {
         where_clause
             .predicates
-            .push(parse_quote!(#ty: oneapi_rs::kernel::KernelArgument));
+            .push(parse_quote!(#ty: #oneapi::kernel::KernelArgument));
     }
 }
 
