@@ -5,6 +5,7 @@ use syn::{
     parse_quote,
 };
 
+/// Derive macro generating an impl of the `KernelArgumentList` trait for a given struct.
 #[proc_macro_derive(KernelArgumentList)]
 pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let mut input = parse_macro_input!(input as DeriveInput);
@@ -57,6 +58,7 @@ fn get_single_tuple_impl(argc: usize) -> proc_macro2::TokenStream {
     }
 }
 
+/// A macro that generates tuples from 2..N which implement the `KernelArgumentList` trait.
 #[proc_macro]
 pub fn impl_arg_list_for_tuples(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as LitInt);
