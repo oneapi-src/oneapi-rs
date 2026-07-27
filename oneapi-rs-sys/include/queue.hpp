@@ -46,4 +46,8 @@ std::unique_ptr<Event>
 launch_3d(std::unique_ptr<Queue> &, Range3 global_size, Range3 local_size,
           Kernel const &,
           rust::Slice<rust::slice<std::uint8_t const> const> args);
+
+std::unique_ptr<Event> memcpy(std::unique_ptr<Queue> &, std::uint8_t *dest,
+                              std::uint8_t *src, std::size_t num_bytes,
+                              rust::Vec<EventPtr>);
 } // namespace sycl_shims::queue
