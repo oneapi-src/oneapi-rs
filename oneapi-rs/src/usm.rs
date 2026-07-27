@@ -30,6 +30,9 @@ pub trait UsmAllocatorKind {
     unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8>;
 }
 
+/// A marker trait for host-accessible USM allocators.
+pub unsafe trait HostAccessible {}
+
 impl<T: UsmAllocatorKind> From<&Queue> for UsmAllocator<T> {
     fn from(queue: &Queue) -> Self {
         Self {
@@ -60,7 +63,7 @@ unsafe impl<T: UsmAllocatorKind> Allocator for UsmAllocator<T> {
 /// An allocator for Device-side buffers
 /// Safety: memory allocated by this allocator cannot be accessed on the host side
 #[allow(dead_code)]
-pub(crate) struct DeviceAllocator;
+pub struct DeviceAllocator;
 
 impl UsmAllocatorKind for DeviceAllocator {
     unsafe fn alloc(alignment: usize, num_bytes: usize, queue: &Queue) -> CxxResult<*mut u8> {
@@ -77,6 +80,8 @@ impl UsmAllocatorKind for HostAllocator {
     }
 }
 
+unsafe impl HostAccessible for UsmAllocator<HostAllocator> {}
+
 /// An allocator for shared memory buffers
 pub struct SharedAllocator;
 
@@ -85,3 +90,5 @@ impl UsmAllocatorKind for SharedAllocator {
         unsafe { ffi::aligned_alloc_shared(alignment, num_bytes, &queue.0) }
     }
 }
+
+unsafe impl HostAccessible for UsmAllocator<SharedAllocator> {}

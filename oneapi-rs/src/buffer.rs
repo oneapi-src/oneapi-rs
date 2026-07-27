@@ -21,7 +21,7 @@ use pin_project::pin_project;
 use crate::{
     event::{Event, EventFuture},
     kernel::KernelArgument,
-    usm::UsmAlloc,
+    usm::{HostAccessible, UsmAlloc},
 };
 
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
@@ -61,12 +61,16 @@ impl<T, A: UsmAlloc> Buffer<T, A> {
         }
     }
 
-    pub(crate) fn get_byte_ptr(&mut self) -> *mut u8 {
+    pub(crate) fn get_byte_ptr(&self) -> *mut u8 {
         self.data.as_ptr().cast()
     }
 
     pub(crate) fn get_byte_size(&self) -> usize {
         self.layout.size()
+    }
+
+    pub(crate) fn get_len(&self) -> usize {
+        self.len
     }
 
     unsafe fn as_raw_arg_impl(&self) -> &[u8] {
@@ -76,14 +80,14 @@ impl<T, A: UsmAlloc> Buffer<T, A> {
     }
 }
 
-impl<T, A: UsmAlloc> Deref for Buffer<T, A> {
+impl<T, A: UsmAlloc + HostAccessible> Deref for Buffer<T, A> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         unsafe { slice::from_raw_parts(self.data.as_ptr(), self.len) }
     }
 }
 
-impl<T, A: UsmAlloc> DerefMut for Buffer<T, A> {
+impl<T, A: UsmAlloc + HostAccessible> DerefMut for Buffer<T, A> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { slice::from_raw_parts_mut(self.data.as_ptr(), self.len) }
     }
