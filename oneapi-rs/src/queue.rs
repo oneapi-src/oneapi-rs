@@ -134,7 +134,7 @@ impl Queue {
         ffi::wait(&mut self.0);
     }
 
-    /// Enqueues a kernel object to the queue an an ND-range kernel, using the number of work-items
+    /// Enqueues a kernel object to the queue as an ND-range kernel, using the number of work-items
     /// specified by the [`NdRange`] nd_range.
     pub unsafe fn launch<const ARGC: usize, const DIMENSIONS: usize>(
         &mut self,
