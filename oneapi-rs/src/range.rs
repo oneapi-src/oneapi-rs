@@ -11,6 +11,7 @@ use oneapi_rs_sys::types;
 use crate::{
     event::Event,
     kernel::{Kernel, KernelArgumentList},
+    private::Sealed,
     queue::Queue,
 };
 
@@ -38,7 +39,7 @@ impl<const DIMENSIONS: usize> NdRange<DIMENSIONS> {
 }
 
 /// [`NdRange`] types which are limited to 1, 2 or 3 dimensions.
-pub trait ValidDimension {
+pub trait ValidDimension: Sealed {
     unsafe fn launch<const ARGC: usize>(
         &self,
         queue: &mut Queue,
@@ -47,6 +48,7 @@ pub trait ValidDimension {
     ) -> Event;
 }
 
+impl Sealed for NdRange<1> {}
 impl ValidDimension for NdRange<1> {
     unsafe fn launch<const ARGC: usize>(
         &self,
@@ -71,6 +73,7 @@ impl ValidDimension for NdRange<1> {
     }
 }
 
+impl Sealed for NdRange<2> {}
 impl ValidDimension for NdRange<2> {
     unsafe fn launch<const ARGC: usize>(
         &self,
@@ -95,6 +98,7 @@ impl ValidDimension for NdRange<2> {
     }
 }
 
+impl Sealed for NdRange<3> {}
 impl ValidDimension for NdRange<3> {
     unsafe fn launch<const ARGC: usize>(
         &self,

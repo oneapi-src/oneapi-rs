@@ -16,3 +16,7 @@ pub mod platform;
 pub mod queue;
 pub mod range;
 pub mod usm;
+
+mod private {
+    pub trait Sealed {}
+}
