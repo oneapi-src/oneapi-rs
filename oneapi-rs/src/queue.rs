@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::cmp::min;
+
 use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
@@ -146,6 +148,52 @@ impl Queue {
         NdRange<DIMENSIONS>: ValidDimension,
     {
         unsafe { nd_range.launch(self, kernel, args) }
+    }
+
+    /// Copies the contents of the source buffer to the destination buffer.
+    ///
+    /// If the buffer sizes don't match we copy the minimum of their sizes.
+    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
+    where
+        A1: UsmAlloc,
+        A2: UsmAlloc,
+    {
+        self.copy_with_deps(src, dst, &[])
+    }
+
+    /// Copies the contents of the source buffer to the destination buffer after all specified
+    /// events finish.
+    ///
+    /// If the buffer sizes don't match we copy the minimum of their sizes.
+    pub fn copy_with_deps<T, A1, A2>(
+        &mut self,
+        src: &Buffer<T, A1>,
+        dst: &mut Buffer<T, A2>,
+        dep_events: &[&Event],
+    ) -> Event
+    where
+        A1: UsmAlloc,
+        A2: UsmAlloc,
+    {
+        let dep_events = dep_events
+            .iter()
+            .map(|e| EventPtr {
+                ptr: (*e).clone().0,
+            })
+            .collect::<Vec<_>>();
+
+        let amount = min(src.get_len(), dst.get_len());
+        let num_bytes = amount * size_of::<T>();
+        unsafe {
+            ffi::memcpy(
+                &mut self.0,
+                dst.get_byte_ptr(),
+                src.get_byte_ptr(),
+                num_bytes,
+                dep_events,
+            )
+        }
+        .into()
     }
 }
 
