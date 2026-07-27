@@ -21,9 +21,10 @@ void iota(double start, double *ptr) {
 }
 "#;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut queue = Queue::new();
-    let mut buffer = queue.alloc_shared::<f64>(1024).wait();
+    let mut device_buffer = queue.alloc_device::<f64>(1024).await;
 
     let kernel = queue
         .get_context()
@@ -31,9 +32,20 @@ fn main() {
         .build()
         .get_kernel("iota");
 
-    unsafe { queue.launch(NdRange::new([1024], [16]), &kernel, (3.14, &mut buffer)) }.wait();
+    unsafe {
+        queue.launch(
+            NdRange::new([1024], [16]),
+            &kernel,
+            (3.14, &mut device_buffer),
+        )
+    }
+    .await;
 
-    for e in buffer.iter() {
+    let mut host_buffer = queue.alloc_host::<f64>(1024).await;
+
+    queue.copy(&device_buffer, &mut host_buffer).await;
+
+    for e in host_buffer.iter() {
         print!("{e} ");
     }
     println!();
