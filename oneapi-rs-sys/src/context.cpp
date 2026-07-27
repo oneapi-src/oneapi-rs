@@ -13,7 +13,7 @@ namespace sycl_shims::context {
 std::unique_ptr<Context> new_context(rust::Vec<DevicePtr> devices) {
   std::vector<sycl::device> raw_devices;
   for (auto &&d : devices)
-    raw_devices.push_back(std::move(*d.ptr.release()));
+    raw_devices.push_back(std::move(*d.ptr));
   return std::make_unique<Context>(raw_devices);
 }
 } // namespace sycl_shims::context
