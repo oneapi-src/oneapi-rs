@@ -178,6 +178,7 @@ impl Queue {
     /// source buffer as possible.
     pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
     where
+        T: Pod,
         A1: UsmAlloc,
         A2: UsmAlloc,
     {
@@ -196,6 +197,7 @@ impl Queue {
         dep_events: &[&Event],
     ) -> Event
     where
+        T: Pod,
         A1: UsmAlloc,
         A2: UsmAlloc,
     {
