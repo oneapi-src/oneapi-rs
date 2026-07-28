@@ -174,7 +174,8 @@ impl Queue {
 
     /// Copies the contents of the source buffer to the destination buffer.
     ///
-    /// If the buffer sizes don't match we copy the minimum of their sizes.
+    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
+    /// source buffer as possible.
     pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
     where
         A1: UsmAlloc,
@@ -186,7 +187,8 @@ impl Queue {
     /// Copies the contents of the source buffer to the destination buffer after all specified
     /// events finish.
     ///
-    /// If the buffer sizes don't match we copy the minimum of their sizes.
+    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
+    /// source buffer as possible.
     pub fn copy_with_deps<T, A1, A2>(
         &mut self,
         src: &Buffer<T, A1>,
