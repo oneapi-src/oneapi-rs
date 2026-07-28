@@ -75,7 +75,7 @@ pub mod ffi {
         unsafe fn memcpy(
             queue: &mut UniquePtr<Queue>,
             dest: *mut u8,
-            src: *mut u8,
+            src: *const u8,
             num_bytes: usize,
             dep_events: Vec<EventPtr>,
         ) -> UniquePtr<Event>;

@@ -100,7 +100,7 @@ launch_3d(std::unique_ptr<Queue> &queue, Range3 global_size, Range3 local_size,
 }
 
 std::unique_ptr<Event> memcpy(std::unique_ptr<Queue> &queue, std::uint8_t *dest,
-                              std::uint8_t *src, std::size_t num_bytes,
+                              std::uint8_t const *src, std::size_t num_bytes,
                               rust::Vec<EventPtr> dep_events) {
   std::vector<sycl::event> deps;
   for (auto &&e : dep_events)
