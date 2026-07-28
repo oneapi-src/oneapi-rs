@@ -199,6 +199,7 @@ impl Queue {
         A1: UsmAlloc,
         A2: UsmAlloc,
     {
+        // TODO: Resolve the C++ lifetime elision issue
         let dep_events = dep_events
             .iter()
             .map(|e| EventPtr {
