@@ -68,6 +68,12 @@ impl<T, A: UsmAlloc> Buffer<T, A> {
     pub(crate) fn get_byte_size(&self) -> usize {
         self.layout.size()
     }
+
+    unsafe fn as_raw_arg_impl(&self) -> &[u8] {
+        let data_ptr: *const NonNull<_> = &self.data;
+        let cast_ptr = data_ptr as *const u8;
+        unsafe { slice::from_raw_parts(cast_ptr, std::mem::size_of_val(&cast_ptr)) }
+    }
 }
 
 impl<T, A: UsmAlloc> Deref for Buffer<T, A> {
@@ -143,8 +149,18 @@ impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
     unsafe fn as_raw_arg(&self) -> &[u8] {
-        let data_ptr: *const NonNull<_> = &self.data;
-        let cast_ptr = data_ptr as *const u8;
-        unsafe { slice::from_raw_parts(cast_ptr, std::mem::size_of_val(&cast_ptr)) }
+        unsafe { self.as_raw_arg_impl() }
+    }
+}
+
+unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &Buffer<T, A> {
+    unsafe fn as_raw_arg(&self) -> &[u8] {
+        unsafe { self.as_raw_arg_impl() }
+    }
+}
+
+unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &mut Buffer<T, A> {
+    unsafe fn as_raw_arg(&self) -> &[u8] {
+        unsafe { self.as_raw_arg_impl() }
     }
 }

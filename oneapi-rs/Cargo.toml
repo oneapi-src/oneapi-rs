@@ -9,6 +9,7 @@ allocator-api2 = "0.4.0"
 bytemuck = "1.25.1"
 cxx = "1.0.194"
 oneapi-rs-sys = { path = "../oneapi-rs-sys" }
+oneapi-rs-derive = { path = "../oneapi-rs-derive" }
 pin-project = "1.1.13"
 thiserror = "2.0.18"
 

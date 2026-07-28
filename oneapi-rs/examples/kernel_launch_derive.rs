@@ -6,7 +6,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use oneapi_rs::{queue::Queue, range::NdRange};
+use oneapi_rs::{
+    buffer::Buffer,
+    kernel::{KernelArgument, KernelArgumentList},
+    queue::Queue,
+    range::NdRange,
+    usm::{SharedAllocator, UsmAllocator},
+};
 
 static IOTA_SRC: &str = r#"
 #include <sycl/sycl.hpp>
@@ -21,6 +27,12 @@ void iota(double start, double *ptr) {
 }
 "#;
 
+#[derive(KernelArgumentList)]
+struct IotaArgs<'a> {
+    start: f64,
+    ptr: &'a mut Buffer<f64, UsmAllocator<SharedAllocator>>,
+}
+
 fn main() {
     let mut queue = Queue::new();
     let mut buffer = queue.alloc_shared::<f64>(1024).wait();
@@ -31,7 +43,17 @@ fn main() {
         .build()
         .get_kernel("iota");
 
-    unsafe { queue.launch(NdRange::new([1024], [16]), &kernel, (3.14, &mut buffer)) }.wait();
+    unsafe {
+        queue.launch(
+            NdRange::new([1024], [16]),
+            &kernel,
+            IotaArgs {
+                start: 3.14,
+                ptr: &mut buffer,
+            },
+        )
+    }
+    .wait();
 
     for e in buffer.iter() {
         print!("{e} ");
