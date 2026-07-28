@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::cmp::min;
+
 use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
@@ -16,7 +18,7 @@ use crate::{
     event::Event,
     kernel::{Kernel, KernelArgumentList},
     range::{NdRange, ValidDimension},
-    usm::{HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
+    usm::{DeviceAllocator, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
 };
 
 /// The `Queue` connects a host program to a single device. Programs submit tasks to a device via the
@@ -64,6 +66,18 @@ impl Queue {
         }
     }
 
+    /// Allocates zeroed memory and creates a device [`Buffer`] that can store an array of T.
+    pub fn alloc_device<T: Pod>(
+        &mut self,
+        len: usize,
+    ) -> EnqueuedBuffer<T, UsmAllocator<DeviceAllocator>> {
+        unsafe {
+            let mut buffer = self.alloc_uninit_device(len);
+            let event = self.memset(&mut buffer, 0);
+            EnqueuedBuffer::new(buffer, event)
+        }
+    }
+
     /// Allocates memory and creates a host-side [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
     pub unsafe fn alloc_uninit_host<T>(
@@ -80,6 +94,16 @@ impl Queue {
         &self,
         len: usize,
     ) -> Buffer<T, UsmAllocator<SharedAllocator>> {
+        let allocator = UsmAllocator::from(self);
+        unsafe { Buffer::new(allocator, len) }
+    }
+
+    /// Allocates memory and creates a device-side [`Buffer`] that can store an array of T.
+    /// Safety: the buffer contents are uninitialized.
+    pub unsafe fn alloc_uninit_device<T>(
+        &self,
+        len: usize,
+    ) -> Buffer<T, UsmAllocator<DeviceAllocator>> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
@@ -146,6 +170,57 @@ impl Queue {
         NdRange<DIMENSIONS>: ValidDimension,
     {
         unsafe { nd_range.launch(self, kernel, args) }
+    }
+
+    /// Copies the contents of the source buffer to the destination buffer.
+    ///
+    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
+    /// source buffer as possible.
+    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
+    where
+        T: Pod,
+        A1: UsmAlloc,
+        A2: UsmAlloc,
+    {
+        self.copy_with_deps(src, dst, &[])
+    }
+
+    /// Copies the contents of the source buffer to the destination buffer after all specified
+    /// events finish.
+    ///
+    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
+    /// source buffer as possible.
+    pub fn copy_with_deps<T, A1, A2>(
+        &mut self,
+        src: &Buffer<T, A1>,
+        dst: &mut Buffer<T, A2>,
+        dep_events: &[&Event],
+    ) -> Event
+    where
+        T: Pod,
+        A1: UsmAlloc,
+        A2: UsmAlloc,
+    {
+        // TODO: Resolve the C++ lifetime elision issue
+        let dep_events = dep_events
+            .iter()
+            .map(|e| EventPtr {
+                ptr: (*e).clone().0,
+            })
+            .collect::<Vec<_>>();
+
+        let amount = min(src.get_len(), dst.get_len());
+        let num_bytes = amount * size_of::<T>();
+        unsafe {
+            ffi::memcpy(
+                &mut self.0,
+                dst.get_byte_ptr(),
+                src.get_byte_ptr(),
+                num_bytes,
+                dep_events,
+            )
+        }
+        .into()
     }
 }
 
