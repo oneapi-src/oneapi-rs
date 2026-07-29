@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+pub mod prelude;
 pub mod buffer;
 pub mod context;
 pub mod device;

@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use oneapi_rs::info;
+use oneapi_rs::info::{self, InfoTarget};
 use oneapi_rs::platform::Platform;
 
 fn main() {
