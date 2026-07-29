@@ -8,10 +8,12 @@
 
 use crate::event::Event;
 use crate::info::Info;
+use crate::private::Sealed;
 use oneapi_rs_sys::event::ffi;
 
 /// Returns the event status of the action associated with this event.
 pub struct CommandExecutionStatus;
+impl Sealed for CommandExecutionStatus {}
 impl Info for CommandExecutionStatus {
     type Item = crate::info::EventCommandStatus;
     type Target = Event;

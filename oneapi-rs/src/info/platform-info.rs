@@ -8,10 +8,12 @@
 
 use crate::info::Info;
 use crate::platform::Platform;
+use crate::private::Sealed;
 use oneapi_rs_sys::platform::ffi;
 
 /// Returns a backend-defined platform version.
 pub struct Version;
+impl Sealed for Version {}
 impl Info for Version {
     type Item = String;
     type Target = Platform;
@@ -22,6 +24,7 @@ impl Info for Version {
 
 /// Returns the name of the platform.
 pub struct Name;
+impl Sealed for Name {}
 impl Info for Name {
     type Item = String;
     type Target = Platform;
@@ -32,6 +35,7 @@ impl Info for Name {
 
 /// Returns the name of the vendor providing the platform.
 pub struct Vendor;
+impl Sealed for Vendor {}
 impl Info for Vendor {
     type Item = String;
     type Target = Platform;

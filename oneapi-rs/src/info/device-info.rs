@@ -8,10 +8,12 @@
 
 use crate::device::Device;
 use crate::info::Info;
+use crate::private::Sealed;
 use oneapi_rs_sys::device::ffi;
 
 /// Returns the device type associated with the device. May not return `oneapi_rs::info::DeviceType::All`
 pub struct DeviceType;
+impl Sealed for DeviceType {}
 impl Info for DeviceType {
     type Item = crate::info::DeviceType;
     type Target = Device;
@@ -22,6 +24,7 @@ impl Info for DeviceType {
 
 /// Returns a backend-defined device version.
 pub struct Version;
+impl Sealed for Version {}
 impl Info for Version {
     type Item = String;
     type Target = Device;
@@ -32,6 +35,7 @@ impl Info for Version {
 
 /// Returns the device name of this SYCL device.
 pub struct Name;
+impl Sealed for Name {}
 impl Info for Name {
     type Item = String;
     type Target = Device;

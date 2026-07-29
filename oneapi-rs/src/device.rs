@@ -8,13 +8,14 @@
 
 use oneapi_rs_sys::device::ffi;
 
-use crate::{info::InfoTarget, platform::Platform};
+use crate::{info::InfoTarget, platform::Platform, private::Sealed};
 
 /// The `Device` struct encapsulates a single SYCL device on which kernels can be executed.
 ///
 /// The `Device` struct provides the common reference semantics.
 pub struct Device(pub(crate) cxx::UniquePtr<ffi::Device>);
 
+impl Sealed for Device {}
 impl InfoTarget for Device {}
 
 impl From<cxx::UniquePtr<ffi::Device>> for Device {

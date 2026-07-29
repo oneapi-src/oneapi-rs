@@ -16,7 +16,7 @@ use oneapi_rs_sys::{event::ffi, types::SharedWaker};
 
 use pin_project::pin_project;
 
-use crate::{info::InfoTarget, queue::Queue};
+use crate::{info::InfoTarget, private::Sealed, queue::Queue};
 
 pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 
@@ -26,6 +26,7 @@ impl Event {
     }
 }
 
+impl Sealed for Event {}
 impl InfoTarget for Event {}
 
 impl From<cxx::UniquePtr<ffi::Event>> for Event {

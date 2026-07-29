@@ -8,7 +8,7 @@
 
 use oneapi_rs_sys::platform::ffi;
 
-use crate::{device::Device, info::InfoTarget};
+use crate::{device::Device, info::InfoTarget, private::Sealed};
 
 /// Abstraction for SYCL platform.
 ///
@@ -18,6 +18,7 @@ use crate::{device::Device, info::InfoTarget};
 /// A `Platform` is also associated with one or more SYCL devices associated with the same SYCL backend.
 pub struct Platform(pub(crate) cxx::UniquePtr<ffi::Platform>);
 
+impl Sealed for Platform {}
 impl InfoTarget for Platform {}
 
 impl Platform {
