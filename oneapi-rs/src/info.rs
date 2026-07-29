@@ -21,14 +21,18 @@ pub use oneapi_rs_sys::device::ffi::DeviceType;
 /// Event status of the contained action associated with this event.
 pub use oneapi_rs_sys::event::ffi::EventCommandStatus;
 
+/// Types which can return an Item of information for a given Target.
 pub trait Info {
     type Item;
     type Target;
 
+    /// Returns information for a given Target.
     fn get_item(target: &Self::Target) -> Self::Item;
 }
 
+/// Types which can be queried for information.
 pub trait InfoTarget {
+    /// Queries this object for information requested by given generic parameter.
     fn get_info<T: Info<Target = Self>>(&self) -> T::Item {
         T::get_item(self)
     }
