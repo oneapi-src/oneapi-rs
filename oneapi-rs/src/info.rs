@@ -20,3 +20,16 @@ pub use oneapi_rs_sys::device::ffi::DeviceType;
 
 /// Event status of the contained action associated with this event.
 pub use oneapi_rs_sys::event::ffi::EventCommandStatus;
+
+pub trait Info {
+    type Item;
+    type Target;
+
+    fn get_item(target: &Self::Target) -> Self::Item;
+}
+
+pub trait InfoTarget {
+    fn get_info<T: Info<Target = Self>>(&self) -> T::Item {
+        T::get_item(self)
+    }
+}
