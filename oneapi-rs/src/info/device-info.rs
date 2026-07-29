@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use crate::info::Info;
 use crate::device::Device;
+use crate::info::Info;
 use oneapi_rs_sys::device::ffi;
 
 /// Returns the device type associated with the device. May not return `oneapi_rs::info::DeviceType::All`

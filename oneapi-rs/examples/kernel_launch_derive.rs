@@ -6,8 +6,9 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use oneapi_rs::prelude::*;
+
 use oneapi_rs::{
-    prelude::*,
     buffer::Buffer,
     queue::Queue,
     range::NdRange,
