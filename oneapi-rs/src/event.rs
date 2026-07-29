@@ -16,7 +16,7 @@ use oneapi_rs_sys::{event::ffi, types::SharedWaker};
 
 use pin_project::pin_project;
 
-use crate::{info::event::EventInfo, queue::Queue};
+use crate::{info::InfoTarget, queue::Queue};
 
 pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 
@@ -24,11 +24,9 @@ impl Event {
     pub fn wait(&mut self) {
         ffi::wait(&mut self.0);
     }
-
-    pub fn get_info<T: EventInfo>(&self) -> T::Item {
-        T::get_item(self)
-    }
 }
+
+impl InfoTarget for Event {}
 
 impl From<cxx::UniquePtr<ffi::Event>> for Event {
     fn from(value: cxx::UniquePtr<ffi::Event>) -> Self {
