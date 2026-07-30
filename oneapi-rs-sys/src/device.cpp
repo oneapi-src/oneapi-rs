@@ -7,18 +7,15 @@
 //
 
 #include "oneapi-rs-sys/include/device.hpp"
+#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/src/device-sys.rs.h"
 
+using sycl_shims::utils::vector_to_vec;
 using dt = sycl::info::device_type;
 
 namespace sycl_shims::device {
 rust::Vec<DevicePtr> get_devices() {
-  rust::Vec<DevicePtr> devices;
-
-  for (auto &&device : sycl::device::get_devices())
-    devices.push_back(DevicePtr{std::make_unique<Device>(device)});
-
-  return devices;
+  return vector_to_vec<DevicePtr>(sycl::device::get_devices());
 }
 
 DeviceType get_device_type(Device const &device) {
