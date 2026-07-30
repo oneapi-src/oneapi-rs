@@ -7,13 +7,13 @@
 //
 
 #include "oneapi-rs-sys/include/context.hpp"
+#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/src/context-sys.rs.h"
+
+using sycl_shims::utils::vec_to_vector;
 
 namespace sycl_shims::context {
 std::unique_ptr<Context> new_context(rust::Vec<DevicePtr> devices) {
-  std::vector<sycl::device> raw_devices;
-  for (auto &&d : devices)
-    raw_devices.push_back(std::move(*d.ptr));
-  return std::make_unique<Context>(raw_devices);
+  return std::make_unique<Context>(vec_to_vector(std::move(devices)));
 }
 } // namespace sycl_shims::context

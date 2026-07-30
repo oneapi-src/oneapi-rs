@@ -7,10 +7,12 @@
 //
 
 #include "oneapi-rs-sys/include/queue.hpp"
+#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/src/queue-sys.rs.h"
 
 using sycl::ext::intel::property::queue::immediate_command_list;
 using sycl::property::queue::in_order;
+using sycl_shims::utils::vec_to_vector;
 
 namespace syclexp = sycl::ext::oneapi::experimental;
 
@@ -39,18 +41,14 @@ std::unique_ptr<Queue> clone(Queue const &queue) {
 std::unique_ptr<Event> memset(std::unique_ptr<Queue> &queue, std::uint8_t *ptr,
                               int value, std::size_t num_bytes,
                               rust::Vec<EventPtr> dep_events) {
-  std::vector<sycl::event> deps;
-  for (auto &&e : dep_events)
-    deps.push_back(std::move(*e.ptr));
-  return std::make_unique<Event>(queue->memset(ptr, value, num_bytes, deps));
+  return std::make_unique<Event>(queue->memset(
+      ptr, value, num_bytes, vec_to_vector(std::move(dep_events))));
 }
 
 std::unique_ptr<Event> barrier(std::unique_ptr<Queue> &queue,
                                rust::Vec<EventPtr> dep_events) {
-  std::vector<sycl::event> deps;
-  for (auto &&e : dep_events)
-    deps.push_back(std::move(*e.ptr));
-  return std::make_unique<Event>(queue->ext_oneapi_submit_barrier(deps));
+  return std::make_unique<Event>(
+      queue->ext_oneapi_submit_barrier(vec_to_vector(std::move(dep_events))));
 }
 
 void wait(std::unique_ptr<Queue> &queue) { queue->wait(); }
@@ -102,10 +100,7 @@ launch_3d(std::unique_ptr<Queue> &queue, Range3 global_size, Range3 local_size,
 std::unique_ptr<Event> memcpy(std::unique_ptr<Queue> &queue, std::uint8_t *dest,
                               std::uint8_t const *src, std::size_t num_bytes,
                               rust::Vec<EventPtr> dep_events) {
-  std::vector<sycl::event> deps;
-  for (auto &&e : dep_events)
-    deps.push_back(std::move(*e.ptr));
-
-  return std::make_unique<Event>(queue->memcpy(dest, src, num_bytes, deps));
+  return std::make_unique<Event>(queue->memcpy(
+      dest, src, num_bytes, vec_to_vector(std::move(dep_events))));
 }
 } // namespace sycl_shims::queue
