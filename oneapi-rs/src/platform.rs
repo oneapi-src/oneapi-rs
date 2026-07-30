@@ -8,7 +8,7 @@
 
 use oneapi_rs_sys::platform::ffi;
 
-use crate::{device::Device, info::platform::PlatformInfo};
+use crate::{device::Device, info::InfoTarget, private::Sealed};
 
 /// Abstraction for SYCL platform.
 ///
@@ -17,6 +17,9 @@ use crate::{device::Device, info::platform::PlatformInfo};
 ///
 /// A `Platform` is also associated with one or more SYCL devices associated with the same SYCL backend.
 pub struct Platform(pub(crate) cxx::UniquePtr<ffi::Platform>);
+
+impl Sealed for Platform {}
+impl InfoTarget for Platform {}
 
 impl Platform {
     /// Returns a [`Vec`] containing all SYCL platforms from all SYCL backends available in the system.
@@ -33,12 +36,5 @@ impl Platform {
             .into_iter()
             .map(|device| Device(device.ptr))
             .collect()
-    }
-
-    /// Queries this `Platform` for information requested by the generic parameter `Param`.
-    /// The associated type `Param::Item` must be defined in accordance with the info parameters
-    /// in [`oneapi_rs::info::platform`](`crate::info::platform`) to facilitate returning the type associated with the `Param` parameter.
-    pub fn get_info<T: PlatformInfo>(&self) -> T::Item {
-        T::get_item(self)
     }
 }

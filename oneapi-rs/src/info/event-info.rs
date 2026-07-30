@@ -7,18 +7,17 @@
 //
 
 use crate::event::Event;
+use crate::info::Info;
+use crate::private::Sealed;
 use oneapi_rs_sys::event::ffi;
-
-pub trait EventInfo {
-    type Item;
-    fn get_item(event: &Event) -> Self::Item;
-}
 
 /// Returns the event status of the action associated with this event.
 pub struct CommandExecutionStatus;
-impl EventInfo for CommandExecutionStatus {
+impl Sealed for CommandExecutionStatus {}
+impl Info for CommandExecutionStatus {
     type Item = crate::info::EventCommandStatus;
-    fn get_item(event: &Event) -> Self::Item {
-        ffi::get_command_execution_status(&event.0)
+    type Target = Event;
+    fn get_item(target: &Self::Target) -> Self::Item {
+        ffi::get_command_execution_status(&target.0)
     }
 }
