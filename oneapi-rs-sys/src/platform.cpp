@@ -6,26 +6,19 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/include/platform.hpp"
 #include "oneapi-rs-sys/src/platform-sys.rs.h"
 
+using sycl_shims::utils::vector_to_vec;
+
 namespace sycl_shims::platform {
 rust::Vec<PlatformPtr> get_platforms() {
-  rust::Vec<PlatformPtr> platforms;
-
-  for (auto &&platform : sycl::platform::get_platforms())
-    platforms.push_back(PlatformPtr{std::make_unique<Platform>(platform)});
-
-  return platforms;
+  return vector_to_vec<PlatformPtr>(sycl::platform::get_platforms());
 }
 
 rust::Vec<DevicePtr> get_devices(Platform const &platform) {
-  rust::Vec<DevicePtr> devices;
-
-  for (auto &&device : platform.get_devices())
-    devices.push_back(DevicePtr{std::make_unique<Device>(device)});
-
-  return devices;
+  return vector_to_vec<DevicePtr>(platform.get_devices());
 }
 
 rust::String get_version(Platform const &platform) {
