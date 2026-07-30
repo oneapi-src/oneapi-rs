@@ -28,4 +28,13 @@ std::vector<UnwrappedPtr<T>> vec_to_vector(rust::Vec<T> &&vec) {
 
   return vector;
 }
+
+template <typename T>
+rust::Vec<T> vector_to_vec(std::vector<UnwrappedPtr<T>> &&vector) {
+  rust::Vec<T> vec;
+  for (auto &&e : vector)
+    vec.push_back(T{std::make_unique<UnwrappedPtr<T>>(e)});
+
+  return vec;
+}
 } // namespace sycl_shims::utils
