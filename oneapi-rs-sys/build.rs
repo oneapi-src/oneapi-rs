@@ -35,6 +35,7 @@ fn main() {
     ];
 
     let cpp_headers = [
+        "include/utils.hpp",
         "include/types.hpp",
         "include/platform.hpp",
         "include/device.hpp",
