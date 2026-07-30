@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/include/device.hpp"
+#include "oneapi-rs-sys/include/utils.hpp"
 #include "oneapi-rs-sys/src/device-sys.rs.h"
 
 using sycl_shims::utils::vector_to_vec;
