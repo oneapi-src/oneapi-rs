@@ -12,14 +12,14 @@
 //! be written using modern ISO C++, and provides APIs and abstractions to find devices
 //! (CPUs, GPUs, FPGAs ...) on which code can be executed, and to manage data resources and code
 //! execution on those devices.
-//! 
+//!
 //! # System dependencies
 //! Make sure to install the [Intel oneAPI toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/oneapi-toolkit-download.html).
 //! Then source the `setvars.sh` file:
 //! ```bash
 //! source <oneapi_install_directory>/setvars.sh
 //! ```
-//! 
+//!
 //! # Getting started
 //! ### Building the crate
 //! Before building this crate you need to source the `setvars.sh` file. You can then build it as
@@ -27,9 +27,9 @@
 //! ```bash
 //! cargo build --release
 //! ```
-//! 
+//!
 //! You must also source `setvars.sh` before running any SYCL program.
-//! 
+//!
 //! ### Hello world
 //! 1. Create a [`Queue`](crate::queue::Queue). It's the main entry point to the SYCL API.
 //! ```
