@@ -1,7 +1,15 @@
 [package]
 name = "oneapi-rs-derive"
 version = "0.1.0"
-edition = "2024"
+description = "Internal procedural macros for oneapi-rs"
+publish = ["crates-io"]
+
+# Inherit settings from the root workspace
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
 
 [lib]
 proc-macro = true
