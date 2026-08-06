@@ -64,7 +64,7 @@ pub unsafe trait KernelArgumentList<const ARGC: usize> {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
 
-unsafe impl<T: KernelArgument> KernelArgumentList<0> for T {
+unsafe impl KernelArgumentList<0> for () {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; 0] {
         []
     }
