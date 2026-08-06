@@ -21,7 +21,9 @@ use pin_project::pin_project;
 use crate::{
     event::{Event, EventFuture},
     kernel::KernelArgument,
-    usm::{HostAccessible, UsmAlloc},
+    usm::{
+        DeviceAllocator, HostAccessible, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator,
+    },
 };
 
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
@@ -100,6 +102,10 @@ impl<T, A: UsmAlloc> Drop for Buffer<T, A> {
         }
     }
 }
+
+pub type HostBuffer<T> = Buffer<T, UsmAllocator<HostAllocator>>;
+pub type SharedBuffer<T> = Buffer<T, UsmAllocator<SharedAllocator>>;
+pub type DeviceBuffer<T> = Buffer<T, UsmAllocator<DeviceAllocator>>;
 
 /// A [`Buffer`] whose initialization has been enqueued. You need to wait/await it.
 pub struct EnqueuedBuffer<T, A: UsmAlloc> {

@@ -12,7 +12,7 @@ use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
 use crate::{
-    buffer::{Buffer, EnqueuedBuffer},
+    buffer::{Buffer, DeviceBuffer, EnqueuedBuffer, HostBuffer, SharedBuffer},
     context::Context,
     device::Device,
     event::Event,
@@ -80,30 +80,21 @@ impl Queue {
 
     /// Allocates memory and creates a host-side [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_host<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<HostAllocator>> {
+    pub unsafe fn alloc_uninit_host<T>(&self, len: usize) -> HostBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
 
     /// Allocates memory and creates a shared [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_shared<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<SharedAllocator>> {
+    pub unsafe fn alloc_uninit_shared<T>(&self, len: usize) -> SharedBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
 
     /// Allocates memory and creates a device-side [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_device<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<DeviceAllocator>> {
+    pub unsafe fn alloc_uninit_device<T>(&self, len: usize) -> DeviceBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
