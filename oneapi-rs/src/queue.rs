@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use crate::Result;
 use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
@@ -121,24 +122,24 @@ impl Queue {
     }
 
     /// Submits a barrier to the queue.
-    pub fn barrier(&mut self) -> Event {
-        self.barrier_with_deps(&[])
+    pub fn barrier(&mut self) -> Result<Event> {
+        self.barrier_with_deps(&[]).map(Into::into)
     }
 
     /// Submits a barrier to the queue after all specified events finish.
-    pub fn barrier_with_deps(&mut self, dep_events: &[&Event]) -> Event {
+    pub fn barrier_with_deps(&mut self, dep_events: &[&Event]) -> Result<Event> {
         let dep_events = dep_events
             .iter()
             .map(|e| EventPtr {
                 ptr: (*e).clone().0,
             })
             .collect::<Vec<_>>();
-        ffi::barrier(&mut self.0, dep_events).into()
+        ffi::barrier(&mut self.0, dep_events).map(Into::into)
     }
 
     /// Performs a blocking wait for the completion of all enqueued tasks in the queue.
-    pub fn wait(&mut self) {
-        ffi::wait(&mut self.0);
+    pub fn wait(&mut self) -> Result<()> {
+        ffi::wait(&mut self.0)
     }
 
     /// Enqueues a kernel object to the queue as an ND-range kernel, using the number of work-items
@@ -148,7 +149,7 @@ impl Queue {
         nd_range: NdRange<DIMENSIONS>,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event
+    ) -> Result<Event>
     where
         NdRange<DIMENSIONS>: ValidDimension,
     {
