@@ -1,13 +1,63 @@
-# Contributing
+# Contributing to oneAPI-rs
 
-### License
+## Development setup
 
-<PROJECT NAME> is licensed under the terms in [LICENSE]<link to license file in repo>. By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
+Install a Rust toolchain with Rust 2024 edition support and Intel oneAPI Toolkit
+2026.1. Clone the repository and initialize the oneAPI environment:
 
-### Sign your work
+```bash
+git clone https://github.com/oneapi-src/oneapi-rs.git
+cd oneapi-rs
+source /opt/intel/oneapi/setvars.sh
+cargo build --workspace
+```
 
-Please use the sign-off line at the end of the patch. Your signature certifies that you wrote the patch or otherwise have the right to pass it on as an open-source patch. The rules are pretty simple: if you can certify
-the below (from [developercertificate.org](http://developercertificate.org/)):
+Replace `/opt/intel/oneapi` if the toolkit is installed elsewhere. To select a
+specific SYCL compiler, set `ONEAPI_CXX` to its full path.
+
+## Formatting
+
+Check Rust formatting:
+
+```bash
+cargo fmt --all -- --check
+```
+
+Check tracked C and C++ sources with `clang-format`:
+
+```bash
+git ls-files -z -- ':(glob)**/*.cpp' ':(glob)**/*.hpp' ':(glob)**/*.h' \
+    | xargs -0 --no-run-if-empty clang-format --dry-run --Werror
+```
+
+To apply Rust formatting, run `cargo fmt --all`. Apply C++ formatting with the
+project's installed `clang-format` before rerunning the check above.
+
+## Tests and examples
+
+Initialize the oneAPI environment in the current shell, then run the workspace
+tests:
+
+```bash
+source /opt/intel/oneapi/setvars.sh
+cargo test --workspace --verbose
+```
+
+The tests and examples require a working SYCL runtime and visible compatible
+device.
+
+## License
+
+oneAPI-rs is licensed under either the [Apache License 2.0](LICENSE-APACHE) or
+the [MIT License](LICENSE-MIT), at your option. By contributing to the project,
+you agree to the license and copyright terms therein and release your contribution
+under these terms.
+
+## Sign your work
+
+Please use the sign-off line at the end of the patch. Your signature certifies
+that you wrote the patch or otherwise have the right to pass it on as an open-source patch.
+The rules are pretty simple: if you can certify the below (from [developercertificate.org](http://developercertificate.org/)):
 
 ```
 Developer Certificate of Origin
