@@ -12,13 +12,16 @@ use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
 use crate::{
-    buffer::{Buffer, EnqueuedBuffer},
+    buffer::{
+        Buffer, DeviceBuffer, EnqueuedBuffer, EnqueuedDeviceBuffer, EnqueuedHostBuffer,
+        EnqueuedSharedBuffer, HostBuffer, SharedBuffer,
+    },
     context::Context,
     device::Device,
     event::Event,
     kernel::{Kernel, KernelArgumentList},
     range::{NdRange, ValidDimension},
-    usm::{DeviceAllocator, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator},
+    usm::{UsmAlloc, UsmAllocator},
 };
 
 /// The `Queue` connects a host program to a single device. Programs submit tasks to a device via the
@@ -43,10 +46,7 @@ impl Queue {
     }
 
     /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
-    pub fn alloc_host<T: Pod>(
-        &mut self,
-        len: usize,
-    ) -> EnqueuedBuffer<T, UsmAllocator<HostAllocator>> {
+    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> EnqueuedHostBuffer<T> {
         unsafe {
             let mut buffer = self.alloc_uninit_host(len);
             let event = self.memset(&mut buffer, 0);
@@ -55,10 +55,7 @@ impl Queue {
     }
 
     /// Allocates zeroed memory and creates a shared [`Buffer`] that can store an array of T.
-    pub fn alloc_shared<T: Pod>(
-        &mut self,
-        len: usize,
-    ) -> EnqueuedBuffer<T, UsmAllocator<SharedAllocator>> {
+    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> EnqueuedSharedBuffer<T> {
         unsafe {
             let mut buffer = self.alloc_uninit_shared(len);
             let event = self.memset(&mut buffer, 0);
@@ -67,10 +64,7 @@ impl Queue {
     }
 
     /// Allocates zeroed memory and creates a device [`Buffer`] that can store an array of T.
-    pub fn alloc_device<T: Pod>(
-        &mut self,
-        len: usize,
-    ) -> EnqueuedBuffer<T, UsmAllocator<DeviceAllocator>> {
+    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> EnqueuedDeviceBuffer<T> {
         unsafe {
             let mut buffer = self.alloc_uninit_device(len);
             let event = self.memset(&mut buffer, 0);
@@ -80,30 +74,21 @@ impl Queue {
 
     /// Allocates memory and creates a host-side [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_host<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<HostAllocator>> {
+    pub unsafe fn alloc_uninit_host<T>(&self, len: usize) -> HostBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
 
     /// Allocates memory and creates a shared [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_shared<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<SharedAllocator>> {
+    pub unsafe fn alloc_uninit_shared<T>(&self, len: usize) -> SharedBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }
 
     /// Allocates memory and creates a device-side [`Buffer`] that can store an array of T.
     /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_device<T>(
-        &self,
-        len: usize,
-    ) -> Buffer<T, UsmAllocator<DeviceAllocator>> {
+    pub unsafe fn alloc_uninit_device<T>(&self, len: usize) -> DeviceBuffer<T> {
         let allocator = UsmAllocator::from(self);
         unsafe { Buffer::new(allocator, len) }
     }

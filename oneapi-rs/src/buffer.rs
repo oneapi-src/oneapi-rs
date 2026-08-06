@@ -21,7 +21,9 @@ use pin_project::pin_project;
 use crate::{
     event::{Event, EventFuture},
     kernel::KernelArgument,
-    usm::{HostAccessible, UsmAlloc},
+    usm::{
+        DeviceAllocator, HostAccessible, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator,
+    },
 };
 
 /// The Buffer struct defines a shared array of one, two or three dimensions that can be used
@@ -101,6 +103,10 @@ impl<T, A: UsmAlloc> Drop for Buffer<T, A> {
     }
 }
 
+pub type HostBuffer<T> = Buffer<T, UsmAllocator<HostAllocator>>;
+pub type SharedBuffer<T> = Buffer<T, UsmAllocator<SharedAllocator>>;
+pub type DeviceBuffer<T> = Buffer<T, UsmAllocator<DeviceAllocator>>;
+
 /// A [`Buffer`] whose initialization has been enqueued. You need to wait/await it.
 pub struct EnqueuedBuffer<T, A: UsmAlloc> {
     buffer: Buffer<T, A>,
@@ -120,6 +126,10 @@ impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
         self.buffer
     }
 }
+
+pub type EnqueuedHostBuffer<T> = EnqueuedBuffer<T, UsmAllocator<HostAllocator>>;
+pub type EnqueuedSharedBuffer<T> = EnqueuedBuffer<T, UsmAllocator<SharedAllocator>>;
+pub type EnqueuedDeviceBuffer<T> = EnqueuedBuffer<T, UsmAllocator<DeviceAllocator>>;
 
 #[pin_project]
 /// A [`Future`] which represents a pending [`Buffer`] allocation.
@@ -150,6 +160,10 @@ impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
         }
     }
 }
+
+pub type HostBufferFuture<T> = BufferFuture<T, UsmAllocator<HostAllocator>>;
+pub type SharedBufferFuture<T> = BufferFuture<T, UsmAllocator<SharedAllocator>>;
+pub type DeviceBufferFuture<T> = BufferFuture<T, UsmAllocator<DeviceAllocator>>;
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
     unsafe fn as_raw_arg(&self) -> &[u8] {
