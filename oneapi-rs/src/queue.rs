@@ -6,8 +6,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use std::cmp::min;
-
 use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
@@ -159,8 +157,7 @@ impl Queue {
 
     /// Copies the contents of the source buffer to the destination buffer.
     ///
-    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
-    /// source buffer as possible.
+    /// Panics if the source and destination buffer lengths differ.
     pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
     where
         T: Pod,
@@ -173,8 +170,7 @@ impl Queue {
     /// Copies the contents of the source buffer to the destination buffer after all specified
     /// events finish.
     ///
-    /// If the buffer sizes don't match the destination buffer is filled with as many elements from
-    /// source buffer as possible.
+    /// Panics if the source and destination buffer lengths differ.
     pub fn copy_with_deps<T, A1, A2>(
         &mut self,
         src: &Buffer<T, A1>,
@@ -186,6 +182,12 @@ impl Queue {
         A1: UsmAlloc,
         A2: UsmAlloc,
     {
+        assert_eq!(
+            src.get_len(),
+            dst.get_len(),
+            "source and destination buffer lengths differ"
+        );
+
         // TODO: Resolve the C++ lifetime elision issue
         let dep_events = dep_events
             .iter()
@@ -194,8 +196,7 @@ impl Queue {
             })
             .collect::<Vec<_>>();
 
-        let amount = min(src.get_len(), dst.get_len());
-        let num_bytes = amount * size_of::<T>();
+        let num_bytes = src.get_len() * size_of::<T>();
         unsafe {
             ffi::memcpy(
                 &mut self.0,
