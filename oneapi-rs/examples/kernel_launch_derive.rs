@@ -8,8 +8,6 @@
 
 use oneapi_rs::prelude::*;
 
-use oneapi_rs::{buffer::SharedBuffer, queue::Queue, range::NdRange};
-
 static IOTA_SRC: &str = r#"
 #include <sycl/sycl.hpp>
 namespace syclext = sycl::ext::oneapi;
