@@ -15,16 +15,16 @@ namespace syclexp = sycl::ext::oneapi::experimental;
 
 extern "C"
 SYCL_EXT_ONEAPI_FUNCTION_PROPERTY((syclexp::nd_range_kernel<1>))
-void iota(double start, double *ptr) {
+void iota(float start, float *ptr) {
     size_t id = syclext::this_work_item::get_nd_item<1>().get_global_linear_id();
-    ptr[id] = start + static_cast<double>(id);
+    ptr[id] = start + static_cast<float>(id);
 }
 "#;
 
 #[tokio::main]
 async fn main() {
     let mut queue = Queue::new();
-    let mut device_buffer = queue.alloc_device::<f64>(1024).await;
+    let mut device_buffer = queue.alloc_device::<f32>(1024).await;
 
     let kernel = queue
         .get_context()
@@ -36,12 +36,12 @@ async fn main() {
         queue.launch(
             NdRange::new([1024], [16]),
             &kernel,
-            (3.14, &mut device_buffer),
+            (3.14_f32, &mut device_buffer),
         )
     }
     .await;
 
-    let mut host_buffer = queue.alloc_host::<f64>(1024).await;
+    let mut host_buffer = queue.alloc_host::<f32>(1024).await;
 
     queue.copy(&device_buffer, &mut host_buffer).await;
 
