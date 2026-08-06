@@ -32,17 +32,17 @@
 //!
 //! ### Hello world
 //! 1. Create a [`Queue`](crate::queue::Queue). It's the main entry point to the SYCL API.
-//! ```
+//! ```rust,ignore
 //! let mut queue = Queue::new();
 //! ```
 //!
 //! 2. Create an [USM buffer](crate::buffer::Buffer) for your data.
-//! ```
+//! ```rust,ignore
 //! let mut device_buffer = queue.alloc_device::<f64>(1024).wait();
 //! ```
 //!
 //! 3. Build a SYCL kernel.
-//! ```
+//! ```rust,ignore
 //! let kernel = queue
 //!     .get_context()
 //!     .create_kernel_bundle_from_source(IOTA_SRC)
@@ -51,7 +51,7 @@
 //! ```
 //!
 //! 4. Launch your kernel.
-//! ```
+//! ```rust,ignore
 //! unsafe {
 //!     queue.launch(
 //!         NdRange::new([1024], [16]),
@@ -63,13 +63,13 @@
 //! ```
 //!
 //! 5. Copy your data to the host.
-//! ```
+//! ```rust,ignore
 //! let mut host_buffer = queue.alloc_host::<f64>(1024).wait();
 //! queue.copy(&device_buffer, &mut host_buffer).wait();
 //! ```
 //!
 //! You can access your host data just like a normal Rust slice.
-//! ```
+//! ```rust,ignore
 //! for e in host_buffer.iter() {
 //!     print!("{e} ");
 //! }
