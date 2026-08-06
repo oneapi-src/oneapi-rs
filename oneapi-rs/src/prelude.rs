@@ -1,10 +1,10 @@
 pub use crate::{
-    info::InfoTarget,
-    platform::Platform,
-    device::Device,
+    buffer::{Buffer, DeviceBuffer, HostBuffer, SharedBuffer},
     context::Context,
+    device::Device,
+    info::InfoTarget,
     kernel::{Kernel, KernelArgument, KernelArgumentList},
-    range::{Range, NdRange},
-    buffer::{Buffer, HostBuffer, DeviceBuffer, SharedBuffer},
-    queue::Queue
+    platform::Platform,
+    queue::Queue,
+    range::{NdRange, Range},
 };
