@@ -127,6 +127,10 @@ impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
     }
 }
 
+pub type EnqueuedHostBuffer<T> = EnqueuedBuffer<T, UsmAllocator<HostAllocator>>;
+pub type EnqueuedSharedBuffer<T> = EnqueuedBuffer<T, UsmAllocator<SharedAllocator>>;
+pub type EnqueuedDeviceBuffer<T> = EnqueuedBuffer<T, UsmAllocator<DeviceAllocator>>;
+
 #[pin_project]
 /// A [`Future`] which represents a pending [`Buffer`] allocation.
 pub struct BufferFuture<T, A: UsmAlloc> {
