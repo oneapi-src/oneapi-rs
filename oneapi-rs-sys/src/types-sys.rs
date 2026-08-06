@@ -104,3 +104,27 @@ pub mod ffi {
     impl Vec<PlatformPtr> {}
     impl Vec<EventPtr> {}
 }
+
+unsafe impl Send for ffi::Device {}
+unsafe impl Sync for ffi::Device {}
+
+unsafe impl Send for ffi::Platform {}
+unsafe impl Sync for ffi::Platform {}
+
+unsafe impl Send for ffi::Queue {}
+unsafe impl Sync for ffi::Queue {}
+
+unsafe impl Send for ffi::Event {}
+unsafe impl Sync for ffi::Event {}
+
+unsafe impl Send for ffi::Context {}
+unsafe impl Sync for ffi::Context {}
+
+unsafe impl Send for ffi::Kernel {}
+unsafe impl Sync for ffi::Kernel {}
+
+unsafe impl Send for ffi::SourceKernelBundle {}
+unsafe impl Sync for ffi::SourceKernelBundle {}
+
+unsafe impl Send for ffi::ExecutableKernelBundle {}
+unsafe impl Sync for ffi::ExecutableKernelBundle {}
