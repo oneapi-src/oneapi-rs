@@ -8,12 +8,7 @@
 
 use oneapi_rs::prelude::*;
 
-use oneapi_rs::{
-    buffer::Buffer,
-    queue::Queue,
-    range::NdRange,
-    usm::{SharedAllocator, UsmAllocator},
-};
+use oneapi_rs::{buffer::SharedBuffer, queue::Queue, range::NdRange};
 
 static IOTA_SRC: &str = r#"
 #include <sycl/sycl.hpp>
@@ -31,7 +26,7 @@ void iota(float start, float *ptr) {
 #[derive(KernelArgumentList)]
 struct IotaArgs<'a> {
     start: f32,
-    ptr: &'a mut Buffer<f32, UsmAllocator<SharedAllocator>>,
+    ptr: &'a mut SharedBuffer<f32>,
 }
 
 fn main() {
