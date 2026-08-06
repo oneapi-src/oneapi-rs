@@ -103,6 +103,9 @@ pub mod queue;
 pub mod range;
 pub mod usm;
 
+pub type SyclError = cxx::Exception;
+pub type Result<T> = std::result::Result<T, SyclError>;
+
 mod private {
     pub trait Sealed {}
 }
