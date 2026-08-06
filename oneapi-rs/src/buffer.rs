@@ -161,6 +161,10 @@ impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
     }
 }
 
+pub type HostBufferFuture<T> = BufferFuture<T, UsmAllocator<HostAllocator>>;
+pub type SharedBufferFuture<T> = BufferFuture<T, UsmAllocator<SharedAllocator>>;
+pub type DeviceBufferFuture<T> = BufferFuture<T, UsmAllocator<DeviceAllocator>>;
+
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for Buffer<T, A> {
     unsafe fn as_raw_arg(&self) -> &[u8] {
         unsafe { self.as_raw_arg_impl() }
