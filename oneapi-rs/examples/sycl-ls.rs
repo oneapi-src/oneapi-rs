@@ -7,7 +7,6 @@
 //
 
 use oneapi_rs::prelude::*;
-use oneapi_rs::{info, platform::Platform};
 
 fn main() {
     for platform in Platform::get_platforms() {
