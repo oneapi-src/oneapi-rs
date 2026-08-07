@@ -1,3 +1,10 @@
 [workspace]
 resolver = "3"
-members = ["oneapi-rs", "oneapi-rs-derive","oneapi-rs-sys"]
+members = ["oneapi-rs", "oneapi-rs-derive", "oneapi-rs-sys"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/oneapi-src/oneapi-rs"
+homepage = "https://github.com/oneapi-src/oneapi-rs"
