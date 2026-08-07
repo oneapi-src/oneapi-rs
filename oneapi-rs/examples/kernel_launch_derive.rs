@@ -27,15 +27,15 @@ struct IotaArgs<'a> {
     ptr: &'a mut SharedBuffer<f32>,
 }
 
-fn main() {
+fn main() -> oneapi_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut buffer = queue.alloc_shared::<f32>(1024).wait();
+    let mut buffer = queue.alloc_shared::<f32>(1024).wait()?;
 
     let kernel = queue
         .get_context()
-        .create_kernel_bundle_from_source(IOTA_SRC)
-        .build()
-        .get_kernel("iota");
+        .create_kernel_bundle_from_source(IOTA_SRC)?
+        .build()?
+        .get_kernel("iota")?;
 
     unsafe {
         queue.launch(
@@ -46,11 +46,13 @@ fn main() {
                 ptr: &mut buffer,
             },
         )
-    }
-    .wait();
+    }?
+    .wait()?;
 
     for e in buffer.iter() {
         print!("{e} ");
     }
     println!();
+
+    Ok(())
 }
