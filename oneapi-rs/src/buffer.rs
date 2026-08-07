@@ -19,6 +19,7 @@ use bytemuck::Pod;
 use pin_project::pin_project;
 
 use crate::{
+    Result,
     event::{Event, EventFuture},
     kernel::KernelArgument,
     usm::{
@@ -121,9 +122,8 @@ impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
 
 impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
     /// Waits for [`Buffer`] initialization to finish.
-    pub fn wait(mut self) -> Buffer<T, A> {
-        self.event.wait();
-        self.buffer
+    pub fn wait(mut self) -> Result<Buffer<T, A>> {
+        self.event.wait().map(|_| self.buffer)
     }
 }
 
@@ -140,17 +140,17 @@ pub struct BufferFuture<T, A: UsmAlloc> {
 }
 
 impl<T, A: UsmAlloc> Future for BufferFuture<T, A> {
-    type Output = Buffer<T, A>;
+    type Output = Result<Buffer<T, A>>;
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let this = self.project();
         this.event_future
             .poll(cx)
-            .map(|_| this.buffer.take().unwrap())
+            .map(|result| result.map(|_| this.buffer.take().unwrap()))
     }
 }
 
 impl<T, A: UsmAlloc> IntoFuture for EnqueuedBuffer<T, A> {
-    type Output = Buffer<T, A>;
+    type Output = Result<Buffer<T, A>>;
     type IntoFuture = BufferFuture<T, A>;
 
     fn into_future(self) -> Self::IntoFuture {
