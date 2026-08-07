@@ -17,7 +17,7 @@ impl Sealed for Version {}
 impl Info for Version {
     type Item = String;
     type Target = Platform;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_version(&target.0)
     }
 }
@@ -28,7 +28,7 @@ impl Sealed for Name {}
 impl Info for Name {
     type Item = String;
     type Target = Platform;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_name(&target.0)
     }
 }
@@ -39,7 +39,7 @@ impl Sealed for Vendor {}
 impl Info for Vendor {
     type Item = String;
     type Target = Platform;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_vendor(&target.0)
     }
 }

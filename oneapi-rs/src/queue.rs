@@ -39,7 +39,7 @@ impl Queue {
     }
 
     /// Returns the SYCL queue’s context.
-    pub fn get_context(&self) -> Context {
+    pub fn context(&self) -> Context {
         ffi::get_context(&self.0).into()
     }
 

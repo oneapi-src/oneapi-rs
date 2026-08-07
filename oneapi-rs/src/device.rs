@@ -27,7 +27,7 @@ impl From<cxx::UniquePtr<ffi::Device>> for Device {
 impl Device {
     /// Returns a [`Vec`] containing all the root devices from all SYCL backends
     /// available in the system which have the device type encapsulated by [`DeviceType`](crate::info::DeviceType).
-    pub fn get_devices() -> Vec<Self> {
+    pub fn all() -> Vec<Self> {
         ffi::get_devices()
             .into_iter()
             .map(|device| Self(device.ptr))
@@ -35,7 +35,7 @@ impl Device {
     }
 
     /// Returns the associated SYCL platform.
-    pub fn get_platform(&self) -> Platform {
+    pub fn platform(&self) -> Platform {
         let raw_platform = ffi::get_platform(&self.0);
         Platform(raw_platform)
     }

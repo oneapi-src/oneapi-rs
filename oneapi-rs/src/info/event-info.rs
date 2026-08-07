@@ -17,7 +17,7 @@ impl Sealed for CommandExecutionStatus {}
 impl Info for CommandExecutionStatus {
     type Item = crate::info::EventCommandStatus;
     type Target = Event;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_command_execution_status(&target.0)
     }
 }

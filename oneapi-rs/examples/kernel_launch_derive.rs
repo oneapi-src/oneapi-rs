@@ -32,10 +32,10 @@ fn main() {
     let mut buffer = queue.alloc_shared::<f32>(1024).wait();
 
     let kernel = queue
-        .get_context()
+        .context()
         .create_kernel_bundle_from_source(IOTA_SRC)
         .build()
-        .get_kernel("iota");
+        .kernel("iota");
 
     unsafe {
         queue.launch(

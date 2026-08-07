@@ -29,13 +29,13 @@ pub trait Info: Sealed {
     type Target;
 
     /// Returns information for a given Target.
-    fn get_item(target: &Self::Target) -> Self::Item;
+    fn item(target: &Self::Target) -> Self::Item;
 }
 
 /// Types which can be queried for information.
 pub trait InfoTarget: Sealed {
     /// Queries this object for information requested by given generic parameter.
-    fn get_info<T: Info<Target = Self>>(&self) -> T::Item {
-        T::get_item(self)
+    fn info<T: Info<Target = Self>>(&self) -> T::Item {
+        T::item(self)
     }
 }

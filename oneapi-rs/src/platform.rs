@@ -23,7 +23,7 @@ impl InfoTarget for Platform {}
 
 impl Platform {
     /// Returns a [`Vec`] containing all SYCL platforms from all SYCL backends available in the system.
-    pub fn get_platforms() -> Vec<Self> {
+    pub fn all() -> Vec<Self> {
         ffi::get_platforms()
             .into_iter()
             .map(|platform| Self(platform.ptr))
@@ -31,7 +31,7 @@ impl Platform {
     }
 
     /// Returns a [`Vec`] containing all the root devices associated with this `Platform`.
-    pub fn get_devices(&self) -> Vec<Device> {
+    pub fn devices(&self) -> Vec<Device> {
         ffi::get_devices(&self.0)
             .into_iter()
             .map(|device| Device(device.ptr))

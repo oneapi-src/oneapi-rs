@@ -17,7 +17,7 @@ impl Sealed for DeviceType {}
 impl Info for DeviceType {
     type Item = crate::info::DeviceType;
     type Target = Device;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_device_type(&target.0)
     }
 }
@@ -28,7 +28,7 @@ impl Sealed for Version {}
 impl Info for Version {
     type Item = String;
     type Target = Device;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_version(&target.0)
     }
 }
@@ -39,7 +39,7 @@ impl Sealed for Name {}
 impl Info for Name {
     type Item = String;
     type Target = Device;
-    fn get_item(target: &Self::Target) -> Self::Item {
+    fn item(target: &Self::Target) -> Self::Item {
         ffi::get_name(&target.0)
     }
 }

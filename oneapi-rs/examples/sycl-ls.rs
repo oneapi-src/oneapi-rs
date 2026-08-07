@@ -9,13 +9,13 @@
 use oneapi_rs::prelude::*;
 
 fn main() {
-    for platform in Platform::get_platforms() {
-        for device in platform.get_devices() {
-            let device_type = device.get_info::<info::device::DeviceType>();
-            let platform_name = platform.get_info::<info::platform::Name>();
-            let device_name = device.get_info::<info::device::Name>();
-            let device_version = device.get_info::<info::device::Version>();
-            let platform_version = platform.get_info::<info::platform::Version>();
+    for platform in Platform::all() {
+        for device in platform.devices() {
+            let device_type = device.info::<info::device::DeviceType>();
+            let platform_name = platform.info::<info::platform::Name>();
+            let device_name = device.info::<info::device::Name>();
+            let device_version = device.info::<info::device::Version>();
+            let platform_version = platform.info::<info::platform::Version>();
 
             println!(
                 "[{device_type:?}] {platform_name}, {device_name} {device_version} [{platform_version}]"

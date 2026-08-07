@@ -27,10 +27,10 @@ async fn main() {
     let mut device_buffer = queue.alloc_device::<f32>(1024).await;
 
     let kernel = queue
-        .get_context()
+        .context()
         .create_kernel_bundle_from_source(IOTA_SRC)
         .build()
-        .get_kernel("iota");
+        .kernel("iota");
 
     unsafe {
         queue.launch(

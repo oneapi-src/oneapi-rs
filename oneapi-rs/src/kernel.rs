@@ -34,7 +34,7 @@ impl From<cxx::UniquePtr<types::ffi::ExecutableKernelBundle>> for ExecutableKern
 }
 
 impl ExecutableKernelBundle {
-    pub fn get_kernel(&mut self, name: &str) -> Kernel {
+    pub fn kernel(&mut self, name: &str) -> Kernel {
         ffi::get_kernel(&mut self.0, name).into()
     }
 }

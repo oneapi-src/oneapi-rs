@@ -44,10 +44,10 @@
 //! 3. Build a SYCL kernel.
 //! ```rust,ignore
 //! let kernel = queue
-//!     .get_context()
+//!     .context()
 //!     .create_kernel_bundle_from_source(IOTA_SRC)
 //!     .build()
-//!     .get_kernel("iota");
+//!     .kernel("iota");
 //! ```
 //!
 //! 4. Launch your kernel.
