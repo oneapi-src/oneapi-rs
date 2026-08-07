@@ -10,6 +10,10 @@ use std::{io::Error, path::PathBuf};
 use which::which;
 
 fn main() {
+    if std::env::var("DOCS_RS").is_ok() {
+        return;
+    }
+
     let compiler_path = get_compiler_path()
         .expect("Expecting a compiler. Set the ONEAPI_CXX environment variable.");
 
