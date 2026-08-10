@@ -87,7 +87,7 @@ jobs:
         <html lang="en">
           <head>
             <meta charset="utf-8">
-            <meta http-equiv="refresh" content="0; url=oneapi_rs/">
+            <meta http-equiv="refresh" content="0; url=sycl_rs/">
             <title>sycl-rs documentation</title>
           </head>
           <body>
