@@ -24,6 +24,7 @@ pub type Range<const DIMENSIONS: usize = 1> = [u64; DIMENSIONS];
 ///
 /// An `NdRange` comprises two [`Range`] parameters: the whole range over which the kernel is to be
 /// executed and the range of each work group.
+#[derive(Clone, Copy, Debug, Hash)]
 pub struct NdRange<const DIMENSIONS: usize = 1> {
     pub group_size: Range<DIMENSIONS>,
     pub local_size: Range<DIMENSIONS>,

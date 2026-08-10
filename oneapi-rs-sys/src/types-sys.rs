@@ -59,7 +59,7 @@ pub mod ffi {
         ptr: UniquePtr<Event>,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Hash)]
     enum DeviceType {
         Cpu,
         Gpu,
@@ -70,7 +70,7 @@ pub mod ffi {
         Unimplemented,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Hash)]
     enum EventCommandStatus {
         Submitted,
         Running,
