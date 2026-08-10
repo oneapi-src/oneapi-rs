@@ -74,24 +74,24 @@ jobs:
 
     - name: Run examples
       run: |
-        for example_path in oneapi-rs/examples/*.rs; do
+        for example_path in sycl/sycl-rs/examples/*.rs; do
           example="$(basename "$example_path" .rs)"
-          cargo run -p oneapi-rs --example "$example" --verbose
+          cargo run -p sycl-rs --example "$example" --verbose
         done
 
     - name: Generate documentation
       run: |
-        cargo doc -p oneapi-rs --no-deps --verbose
+        cargo doc -p sycl-rs --no-deps --verbose
         cat > target/doc/index.html <<'HTML'
         <!doctype html>
         <html lang="en">
           <head>
             <meta charset="utf-8">
             <meta http-equiv="refresh" content="0; url=oneapi_rs/">
-            <title>oneapi-rs documentation</title>
+            <title>sycl-rs documentation</title>
           </head>
           <body>
-            <p><a href="oneapi_rs/">oneapi-rs documentation</a></p>
+            <p><a href="sycl_rs/">sycl-rs documentation</a></p>
           </body>
         </html>
         HTML
