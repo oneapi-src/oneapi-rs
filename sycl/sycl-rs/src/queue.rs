@@ -139,6 +139,8 @@ impl Queue {
 
     /// Performs a blocking wait for the completion of all enqueued tasks in the queue. Returns an
     /// error if a synchronous SYCL exception occurs.
+    ///
+    /// Dropping the queue does not wait for its completion.
     pub fn wait(&mut self) -> Result<()> {
         ffi::wait(&mut self.0)
     }

@@ -23,6 +23,8 @@ pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 impl Event {
     /// Performs a blocking wait for the event to complete. Returns an error if a synchronous SYCL
     /// exception occurs.
+    ///
+    /// Dropping the event does not wait for its completion.
     pub fn wait(&mut self) -> Result<()> {
         ffi::wait(&mut self.0)
     }

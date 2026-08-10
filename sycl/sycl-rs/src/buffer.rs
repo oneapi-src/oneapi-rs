@@ -123,6 +123,8 @@ impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
 impl<T, A: UsmAlloc> EnqueuedBuffer<T, A> {
     /// Performs a blocking wait for the [`Buffer`] initialization to complete. Returns an error if
     /// a synchronous SYCL exception occurs.
+    ///
+    /// Dropping an enqueued buffer does not wait for its completion.
     pub fn wait(mut self) -> Result<Buffer<T, A>> {
         self.event.wait().map(|_| self.buffer)
     }
