@@ -8,7 +8,7 @@
 
 use std::{
     pin::Pin,
-    sync::atomic::Ordering::Relaxed,
+    sync::{Arc, atomic::Ordering::Relaxed},
     task::{Context, Poll},
 };
 
@@ -44,7 +44,7 @@ impl Clone for Event {
 #[pin_project]
 pub struct EventFuture {
     event: Event,
-    shared: SharedWaker,
+    shared: Arc<SharedWaker>,
     set_callback: bool,
     queue: Option<Queue>,
 }
@@ -60,10 +60,11 @@ impl Future for EventFuture {
             *this.set_callback = true;
             let mut queue = Queue::new_immediate();
             this.shared.waker.register(cx.waker());
-            // Safety: the SharedWaker will always outlive the C++ host task.
-            // Safety: the Future which holds the SharedWaker is pinned - the pointer will remain valid.
-            let result =
-                unsafe { ffi::register_callback(&mut queue.0, &this.event.0, this.shared) };
+
+            // Safety: registered callback will decrement the Arc strong reference count, which is
+            // large enough because it was increased by the previous clone().
+            let ptr = Arc::into_raw(this.shared.clone());
+            let result = unsafe { ffi::register_callback(&mut queue.0, &this.event.0, ptr) };
             match result {
                 Ok(_) => {
                     this.queue.replace(queue);
@@ -100,7 +101,7 @@ impl IntoFuture for Event {
     fn into_future(self) -> Self::IntoFuture {
         EventFuture {
             event: self,
-            shared: SharedWaker::new(),
+            shared: Arc::new(SharedWaker::new()),
             set_callback: false,
             queue: None,
         }
