@@ -159,7 +159,7 @@ impl Queue {
     /// Copies the contents of the source buffer to the destination buffer.
     ///
     /// Panics if the source and destination buffer lengths differ.
-    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
+    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Result<Event>
     where
         T: Pod,
         A1: UsmAlloc,
@@ -177,7 +177,7 @@ impl Queue {
         src: &Buffer<T, A1>,
         dst: &mut Buffer<T, A2>,
         dep_events: &[&Event],
-    ) -> Event
+    ) -> Result<Event>
     where
         T: Pod,
         A1: UsmAlloc,
@@ -207,7 +207,7 @@ impl Queue {
                 dep_events,
             )
         }
-        .into()
+        .map(Into::into)
     }
 }
 

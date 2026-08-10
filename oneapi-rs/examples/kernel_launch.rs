@@ -43,7 +43,7 @@ async fn main() -> oneapi_rs::Result<()> {
 
     let mut host_buffer = queue.alloc_host::<f32>(1024)?.await?;
 
-    queue.copy(&device_buffer, &mut host_buffer).await?;
+    queue.copy(&device_buffer, &mut host_buffer)?.await?;
 
     for e in host_buffer.iter() {
         print!("{e} ");

@@ -45,6 +45,14 @@ pub mod ffi {
             dep_events: Vec<EventPtr>,
         ) -> Result<UniquePtr<Event>>;
 
+        unsafe fn memcpy(
+            queue: &mut UniquePtr<Queue>,
+            dest: *mut u8,
+            src: *const u8,
+            num_bytes: usize,
+            dep_events: Vec<EventPtr>,
+        ) -> Result<UniquePtr<Event>>;
+
         fn barrier(
             queue: &mut UniquePtr<Queue>,
             dep_events: Vec<EventPtr>,
@@ -75,13 +83,5 @@ pub mod ffi {
             kernel: &Kernel,
             args: &[&[u8]],
         ) -> Result<UniquePtr<Event>>;
-
-        unsafe fn memcpy(
-            queue: &mut UniquePtr<Queue>,
-            dest: *mut u8,
-            src: *const u8,
-            num_bytes: usize,
-            dep_events: Vec<EventPtr>,
-        ) -> UniquePtr<Event>;
     }
 }
