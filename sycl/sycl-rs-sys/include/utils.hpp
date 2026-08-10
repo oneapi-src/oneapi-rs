@@ -13,8 +13,8 @@
 #include <utility>
 #include <vector>
 
-#include "sycl-rs-sys/include/types.hpp"
 #include "rust/cxx.h"
+#include "sycl-rs-sys/include/types.hpp"
 
 namespace sycl_shims::utils {
 template <typename T>

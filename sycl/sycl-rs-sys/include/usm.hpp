@@ -10,8 +10,8 @@
 
 #include <memory>
 
-#include "sycl-rs-sys/include/types.hpp"
 #include "rust/cxx.h"
+#include "sycl-rs-sys/include/types.hpp"
 
 namespace sycl_shims::usm {
 std::uint8_t *aligned_alloc_device(std::size_t alignment, std::size_t num_bytes,

@@ -12,8 +12,8 @@
 
 #include <sycl/sycl.hpp>
 
-#include "sycl-rs-sys/include/types.hpp"
 #include "rust/cxx.h"
+#include "sycl-rs-sys/include/types.hpp"
 
 namespace sycl_shims {
 struct DevicePtr;

@@ -10,9 +10,9 @@
 
 #include <memory>
 
+#include "rust/cxx.h"
 #include "sycl-rs-sys/include/types.hpp"
 #include "sycl-rs-sys/src/event-sys.rs.h"
-#include "rust/cxx.h"
 
 namespace sycl_shims {
 enum class EventCommandStatus : std::uint8_t;
