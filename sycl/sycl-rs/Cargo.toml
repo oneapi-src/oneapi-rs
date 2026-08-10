@@ -3,7 +3,7 @@ name = "sycl-rs"
 version = "0.1.0"
 description = "Rust bindings for SYCL"
 documentation = "https://docs.rs/sycl-rs"
-keywords = ["oneapi", "sycl", "gpu", "oneapi"]
+keywords = ["oneapi", "sycl", "gpu"]
 categories = [
     "api-bindings",
     "hardware-support",
