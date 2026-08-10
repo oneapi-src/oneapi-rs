@@ -137,13 +137,19 @@ impl Queue {
         ffi::barrier(&mut self.0, dep_events).map(Into::into)
     }
 
-    /// Performs a blocking wait for the completion of all enqueued tasks in the queue.
+    /// Performs a blocking wait for the completion of all enqueued tasks in the queue. Returns an
+    /// error if a synchronous SYCL exception occurs.
+    ///
+    /// Dropping the queue does not wait for its completion.
     pub fn wait(&mut self) -> Result<()> {
         ffi::wait(&mut self.0)
     }
 
     /// Enqueues a kernel object to the queue as an ND-range kernel, using the number of work-items
     /// specified by the [`NdRange`] nd_range.
+    ///
+    /// Safety: The caller must make sure each argument matches the launched SYCL kernel's
+    /// signature, including their respective size, layout and alignment.
     pub unsafe fn launch<const ARGC: usize, const DIMENSIONS: usize>(
         &mut self,
         nd_range: NdRange<DIMENSIONS>,
