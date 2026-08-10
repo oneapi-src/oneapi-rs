@@ -54,6 +54,10 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
 /// Safety: a type implement this trait must mirror the representation and alignment of the
 /// corresponding SYCL kernel argument structure.
 pub unsafe trait KernelArgument {
+    /// Converts self to a raw byte representation.
+    ///
+    /// Safety: This function returns a reference to raw bytes. These bytes will be passed to FFI
+    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
     unsafe fn as_raw_arg(&self) -> &[u8];
 }
 
@@ -68,6 +72,10 @@ unsafe impl<T: Pod> KernelArgument for T {
 /// Safety: a type implement this trait must mirror the representation and alignment of each
 /// corresponding SYCL kernel argument inside the returned array.
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
+    /// Converts each struct member to a raw byte representation.
+    ///
+    /// Safety: This function returns references to raw bytes. These bytes will be passed to FFI
+    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
 

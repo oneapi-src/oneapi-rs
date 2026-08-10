@@ -147,6 +147,9 @@ impl Queue {
 
     /// Enqueues a kernel object to the queue as an ND-range kernel, using the number of work-items
     /// specified by the [`NdRange`] nd_range.
+    ///
+    /// Safety: The caller must make sure each argument matches the launched SYCL kernel's
+    /// signature, including their respective size, layout and alignment.
     pub unsafe fn launch<const ARGC: usize, const DIMENSIONS: usize>(
         &mut self,
         nd_range: NdRange<DIMENSIONS>,
