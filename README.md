@@ -34,16 +34,28 @@ support C++17 and SYCL.
 
 ## Installation
 
-The crates are not yet published. To build the workspace from source:
+Add your required dependencies with Cargo:
 
+```bash
+cargo add sycl-rs
+```
+
+Make sure to source the `setvars.sh` file before building your project.
+
+```bash
+source /opt/intel/oneapi/setvars.sh
+cargo build
+```
+
+## Quick start
+
+Build the workspace from source:
 ```bash
 git clone https://github.com/oneapi-src/oneapi-rs.git
 cd oneapi-rs
 source /opt/intel/oneapi/setvars.sh
 cargo build --workspace
 ```
-
-## Quick start
 
 List the SYCL devices visible to the runtime:
 
@@ -61,7 +73,7 @@ cargo run -p sycl-rs --example kernel_launch
 
 ## Documentation
 
-- [API documentation](https://oneapi-src.github.io/oneapi-rs/sycl_rs/)
+- [API documentation](https://docs.rs/sycl_rs/)
 - [Examples](sycl/sycl-rs/examples)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
