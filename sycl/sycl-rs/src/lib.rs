@@ -20,6 +20,10 @@
 //! source <oneapi_install_directory>/setvars.sh
 //! ```
 //!
+//! This project was tested on oneAPI Toolkit 2026.1 and requires the Unified Runtime over Level Zero
+//! driver version 1.14.37020 or newer. For more detailed information check out the
+//! [required extensions](crate#required-extensions) section.
+//!
 //! # Getting started
 //! ### Building the crate
 //! Before building this crate you need to source the `setvars.sh` file. You can then build it as
@@ -104,6 +108,15 @@
 //! All basic SYCL wrapper types (`Queue`, `Event`, `Context`, `Platform`, `Device`) are thread safe as
 //! indicated by the provided [`Send`] and [`Sync`] trait implementations. However - Buffers are
 //! not thread-safe. If you need a thread-safe Buffer you need to wrap it in an `Arc<Mutex<T>>`.
+//!
+//! # Required extensions
+//! This project requires the following SYCL extensions to work:
+//! - [sycl_ext_oneapi_kernel_compiler](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/experimental/sycl_ext_oneapi_kernel_compiler.asciidoc)
+//! - [sycl_ext_oneapi_raw_kernel_arg](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/experimental/sycl_ext_oneapi_raw_kernel_arg.asciidoc)
+//!
+//! The following extensions are also required for async support:
+//! - [sycl_ext_intel_queue_immediate_command_list](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/supported/sycl_ext_intel_queue_immediate_command_list.asciidoc)
+//! - [sycl_ext_oneapi_enqueue_barrier](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/supported/sycl_ext_oneapi_enqueue_barrier.asciidoc)
 
 pub mod buffer;
 pub mod context;
