@@ -90,7 +90,8 @@
 //!   - Note: Unlike SYCL buffers, SYCL-rs buffers do not rely on accessors.
 //! - Buffers are zero-initialized by default.
 //! - Buffers can only store types that implement [`bytemuck::Pod`].
-//! - Kernel launch is inherently unsafe.
+//! - Kernel launch is inherently unsafe. In particular, the caller must ensure that every argument
+//!   has the correct representation, layout, and alignment.
 //!
 //! # Asynchronous programming model
 //! Each queue operation returns an [`Event`](`crate::event::Event`). You can synchronously

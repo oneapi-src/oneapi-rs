@@ -50,6 +50,9 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
 }
 
 /// Types which can be passed as SYCL kernel arguments.
+///
+/// Safety: a type implement this trait must mirror the representation and alignment of the
+/// corresponding SYCL kernel argument structure.
 pub unsafe trait KernelArgument {
     unsafe fn as_raw_arg(&self) -> &[u8];
 }
@@ -61,6 +64,9 @@ unsafe impl<T: Pod> KernelArgument for T {
 }
 
 /// Types which describe an argument list for a SYCL kernel.
+///
+/// Safety: a type implement this trait must mirror the representation and alignment of each
+/// corresponding SYCL kernel argument inside the returned array.
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
     unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
 }
