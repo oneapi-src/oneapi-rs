@@ -43,34 +43,7 @@ pub mod ffi {
             value: i32,
             num_bytes: usize,
             dep_events: Vec<EventPtr>,
-        ) -> UniquePtr<Event>;
-
-        fn barrier(queue: &mut UniquePtr<Queue>, dep_events: Vec<EventPtr>) -> UniquePtr<Event>;
-        fn wait(queue: &mut UniquePtr<Queue>);
-
-        unsafe fn launch_1d(
-            queue: &mut UniquePtr<Queue>,
-            global_size: Range1,
-            local_size: Range1,
-            kernel: &Kernel,
-            args: &[&[u8]],
-        ) -> UniquePtr<Event>;
-
-        unsafe fn launch_2d(
-            queue: &mut UniquePtr<Queue>,
-            global_size: Range2,
-            local_size: Range2,
-            kernel: &Kernel,
-            args: &[&[u8]],
-        ) -> UniquePtr<Event>;
-
-        unsafe fn launch_3d(
-            queue: &mut UniquePtr<Queue>,
-            global_size: Range3,
-            local_size: Range3,
-            kernel: &Kernel,
-            args: &[&[u8]],
-        ) -> UniquePtr<Event>;
+        ) -> Result<UniquePtr<Event>>;
 
         unsafe fn memcpy(
             queue: &mut UniquePtr<Queue>,
@@ -78,6 +51,37 @@ pub mod ffi {
             src: *const u8,
             num_bytes: usize,
             dep_events: Vec<EventPtr>,
-        ) -> UniquePtr<Event>;
+        ) -> Result<UniquePtr<Event>>;
+
+        fn barrier(
+            queue: &mut UniquePtr<Queue>,
+            dep_events: Vec<EventPtr>,
+        ) -> Result<UniquePtr<Event>>;
+
+        fn wait(queue: &mut UniquePtr<Queue>) -> Result<()>;
+
+        unsafe fn launch_1d(
+            queue: &mut UniquePtr<Queue>,
+            global_size: Range1,
+            local_size: Range1,
+            kernel: &Kernel,
+            args: &[&[u8]],
+        ) -> Result<UniquePtr<Event>>;
+
+        unsafe fn launch_2d(
+            queue: &mut UniquePtr<Queue>,
+            global_size: Range2,
+            local_size: Range2,
+            kernel: &Kernel,
+            args: &[&[u8]],
+        ) -> Result<UniquePtr<Event>>;
+
+        unsafe fn launch_3d(
+            queue: &mut UniquePtr<Queue>,
+            global_size: Range3,
+            local_size: Range3,
+            kernel: &Kernel,
+            args: &[&[u8]],
+        ) -> Result<UniquePtr<Event>>;
     }
 }

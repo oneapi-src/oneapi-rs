@@ -25,12 +25,14 @@ pub mod ffi {
         #[namespace = "sycl_shims"]
         type Queue = crate::types::ffi::Queue;
 
-        fn wait(event: &mut UniquePtr<Event>);
+        fn wait(event: &mut UniquePtr<Event>) -> Result<()>;
+
         unsafe fn register_callback(
             queue: &mut UniquePtr<Queue>,
             event: &Event,
             waker: *const SharedWaker,
-        );
+        ) -> Result<()>;
+
         fn get_command_execution_status(event: &Event) -> EventCommandStatus;
         fn clone(event: &Event) -> UniquePtr<Event>;
     }

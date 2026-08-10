@@ -22,15 +22,15 @@ void iota(float start, float *ptr) {
 "#;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> oneapi_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut device_buffer = queue.alloc_device::<f32>(1024).await;
+    let mut device_buffer = queue.alloc_device::<f32>(1024)?.await?;
 
     let kernel = queue
         .get_context()
-        .create_kernel_bundle_from_source(IOTA_SRC)
-        .build()
-        .get_kernel("iota");
+        .create_kernel_bundle_from_source(IOTA_SRC)?
+        .build()?
+        .get_kernel("iota")?;
 
     unsafe {
         queue.launch(
@@ -38,15 +38,17 @@ async fn main() {
             &kernel,
             (3.14_f32, &mut device_buffer),
         )
-    }
-    .await;
+    }?
+    .await?;
 
-    let mut host_buffer = queue.alloc_host::<f32>(1024).await;
+    let mut host_buffer = queue.alloc_host::<f32>(1024)?.await?;
 
-    queue.copy(&device_buffer, &mut host_buffer).await;
+    queue.copy(&device_buffer, &mut host_buffer)?.await?;
 
     for e in host_buffer.iter() {
         print!("{e} ");
     }
     println!();
+
+    Ok(())
 }

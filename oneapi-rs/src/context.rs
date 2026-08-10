@@ -8,7 +8,7 @@
 
 use oneapi_rs_sys::{context::ffi, kernel_bundle, types::ffi::DevicePtr};
 
-use crate::{device::Device, kernel::SourceKernelBundle};
+use crate::{Result, device::Device, kernel::SourceKernelBundle};
 
 /// A context represents the runtime data structures and state required by a SYCL backend API
 /// to interact with a group of devices associated with a platform.
@@ -32,7 +32,7 @@ impl Context {
         ffi::new_context(devices).into()
     }
 
-    pub fn create_kernel_bundle_from_source(&self, source: &str) -> SourceKernelBundle {
-        kernel_bundle::ffi::create_kernel_bundle_from_source(&self.0, source).into()
+    pub fn create_kernel_bundle_from_source(&self, source: &str) -> Result<SourceKernelBundle> {
+        kernel_bundle::ffi::create_kernel_bundle_from_source(&self.0, source).map(Into::into)
     }
 }

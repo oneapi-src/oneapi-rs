@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use crate::Result;
 use bytemuck::Pod;
 use oneapi_rs_sys::{kernel_bundle::ffi, types};
 
@@ -19,8 +20,8 @@ impl From<cxx::UniquePtr<types::ffi::SourceKernelBundle>> for SourceKernelBundle
 }
 
 impl SourceKernelBundle {
-    pub fn build(&mut self) -> ExecutableKernelBundle {
-        ffi::build(&mut self.0).into()
+    pub fn build(&mut self) -> Result<ExecutableKernelBundle> {
+        ffi::build(&mut self.0).map(Into::into)
     }
 }
 
@@ -34,8 +35,8 @@ impl From<cxx::UniquePtr<types::ffi::ExecutableKernelBundle>> for ExecutableKern
 }
 
 impl ExecutableKernelBundle {
-    pub fn get_kernel(&mut self, name: &str) -> Kernel {
-        ffi::get_kernel(&mut self.0, name).into()
+    pub fn get_kernel(&mut self, name: &str) -> Result<Kernel> {
+        ffi::get_kernel(&mut self.0, name).map(Into::into)
     }
 }
 

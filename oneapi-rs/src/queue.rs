@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use crate::Result;
 use bytemuck::Pod;
 use oneapi_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
@@ -44,29 +45,29 @@ impl Queue {
     }
 
     /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
-    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> EnqueuedHostBuffer<T> {
+    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> Result<EnqueuedHostBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_host(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
     /// Allocates zeroed memory and creates a shared [`Buffer`] that can store an array of T.
-    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> EnqueuedSharedBuffer<T> {
+    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> Result<EnqueuedSharedBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_shared(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
     /// Allocates zeroed memory and creates a device [`Buffer`] that can store an array of T.
-    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> EnqueuedDeviceBuffer<T> {
+    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> Result<EnqueuedDeviceBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_device(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
@@ -97,7 +98,7 @@ impl Queue {
         &mut self,
         buffer: &mut Buffer<T, A>,
         value: i32,
-    ) -> Event {
+    ) -> Result<Event> {
         unsafe { self.memset_with_deps(buffer, value, &[]) }
     }
 
@@ -108,7 +109,7 @@ impl Queue {
         buffer: &mut Buffer<T, A>,
         value: i32,
         dep_events: &[&Event],
-    ) -> Event {
+    ) -> Result<Event> {
         let ptr = buffer.get_byte_ptr();
         let num_bytes = buffer.get_byte_size();
         let dep_events = dep_events
@@ -117,28 +118,28 @@ impl Queue {
                 ptr: (*e).clone().0,
             })
             .collect::<Vec<_>>();
-        unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }.into()
+        unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }.map(Into::into)
     }
 
     /// Submits a barrier to the queue.
-    pub fn barrier(&mut self) -> Event {
-        self.barrier_with_deps(&[])
+    pub fn barrier(&mut self) -> Result<Event> {
+        self.barrier_with_deps(&[]).map(Into::into)
     }
 
     /// Submits a barrier to the queue after all specified events finish.
-    pub fn barrier_with_deps(&mut self, dep_events: &[&Event]) -> Event {
+    pub fn barrier_with_deps(&mut self, dep_events: &[&Event]) -> Result<Event> {
         let dep_events = dep_events
             .iter()
             .map(|e| EventPtr {
                 ptr: (*e).clone().0,
             })
             .collect::<Vec<_>>();
-        ffi::barrier(&mut self.0, dep_events).into()
+        ffi::barrier(&mut self.0, dep_events).map(Into::into)
     }
 
     /// Performs a blocking wait for the completion of all enqueued tasks in the queue.
-    pub fn wait(&mut self) {
-        ffi::wait(&mut self.0);
+    pub fn wait(&mut self) -> Result<()> {
+        ffi::wait(&mut self.0)
     }
 
     /// Enqueues a kernel object to the queue as an ND-range kernel, using the number of work-items
@@ -148,7 +149,7 @@ impl Queue {
         nd_range: NdRange<DIMENSIONS>,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event
+    ) -> Result<Event>
     where
         NdRange<DIMENSIONS>: ValidDimension,
     {
@@ -158,7 +159,7 @@ impl Queue {
     /// Copies the contents of the source buffer to the destination buffer.
     ///
     /// Panics if the source and destination buffer lengths differ.
-    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Event
+    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Result<Event>
     where
         T: Pod,
         A1: UsmAlloc,
@@ -176,7 +177,7 @@ impl Queue {
         src: &Buffer<T, A1>,
         dst: &mut Buffer<T, A2>,
         dep_events: &[&Event],
-    ) -> Event
+    ) -> Result<Event>
     where
         T: Pod,
         A1: UsmAlloc,
@@ -206,7 +207,7 @@ impl Queue {
                 dep_events,
             )
         }
-        .into()
+        .map(Into::into)
     }
 }
 

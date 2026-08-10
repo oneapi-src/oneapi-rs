@@ -16,13 +16,13 @@ use oneapi_rs_sys::{event::ffi, types::SharedWaker};
 
 use pin_project::pin_project;
 
-use crate::{info::InfoTarget, private::Sealed, queue::Queue};
+use crate::{Result, info::InfoTarget, private::Sealed, queue::Queue};
 
 pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 
 impl Event {
-    pub fn wait(&mut self) {
-        ffi::wait(&mut self.0);
+    pub fn wait(&mut self) -> Result<()> {
+        ffi::wait(&mut self.0)
     }
 }
 
@@ -50,7 +50,7 @@ pub struct EventFuture {
 }
 
 impl Future for EventFuture {
-    type Output = ();
+    type Output = Result<()>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let this = self.project();
@@ -62,12 +62,21 @@ impl Future for EventFuture {
             this.shared.waker.register(cx.waker());
             // Safety: the SharedWaker will always outlive the C++ host task.
             // Safety: the Future which holds the SharedWaker is pinned - the pointer will remain valid.
-            unsafe { ffi::register_callback(&mut queue.0, &this.event.0, this.shared) };
-            this.queue.replace(queue);
+            let result =
+                unsafe { ffi::register_callback(&mut queue.0, &this.event.0, this.shared) };
+            match result {
+                Ok(_) => {
+                    this.queue.replace(queue);
+                }
+                Err(_) => {
+                    return Poll::Ready(result);
+                }
+            }
         } else {
             // Quick check before registering to avoid wasting time
             if this.shared.done.load(Relaxed) {
-                return Poll::Ready(());
+                // The event finished - waiting for it returns immediately
+                return Poll::Ready(this.event.wait());
             }
 
             this.shared.waker.register(cx.waker());
@@ -76,7 +85,8 @@ impl Future for EventFuture {
         // Check the event again to avoid a race condition
         // https://docs.rs/futures/latest/futures/task/struct.AtomicWaker.html#examples
         if this.shared.done.load(Relaxed) {
-            Poll::Ready(())
+            // The event finished - waiting for it returns immediately
+            Poll::Ready(this.event.wait())
         } else {
             Poll::Pending
         }
@@ -84,7 +94,7 @@ impl Future for EventFuture {
 }
 
 impl IntoFuture for Event {
-    type Output = ();
+    type Output = Result<()>;
     type IntoFuture = EventFuture;
 
     fn into_future(self) -> Self::IntoFuture {

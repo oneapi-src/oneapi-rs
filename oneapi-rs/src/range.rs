@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use crate::Result;
 use oneapi_rs_sys::types;
 
 use crate::{
@@ -46,7 +47,7 @@ pub trait ValidDimension: Sealed {
         queue: &mut Queue,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event;
+    ) -> Result<Event>;
 }
 
 impl Sealed for NdRange<1> {}
@@ -56,7 +57,7 @@ impl ValidDimension for NdRange<1> {
         queue: &mut Queue,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event {
+    ) -> Result<Event> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_1d(
                 &mut queue.0,
@@ -70,7 +71,7 @@ impl ValidDimension for NdRange<1> {
                 &args.as_raw_arg_list(),
             )
         }
-        .into()
+        .map(Into::into)
     }
 }
 
@@ -81,7 +82,7 @@ impl ValidDimension for NdRange<2> {
         queue: &mut Queue,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event {
+    ) -> Result<Event> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_2d(
                 &mut queue.0,
@@ -95,7 +96,7 @@ impl ValidDimension for NdRange<2> {
                 &args.as_raw_arg_list(),
             )
         }
-        .into()
+        .map(Into::into)
     }
 }
 
@@ -106,7 +107,7 @@ impl ValidDimension for NdRange<3> {
         queue: &mut Queue,
         kernel: &Kernel,
         args: impl KernelArgumentList<ARGC>,
-    ) -> Event {
+    ) -> Result<Event> {
         unsafe {
             oneapi_rs_sys::queue::ffi::launch_3d(
                 &mut queue.0,
@@ -120,6 +121,6 @@ impl ValidDimension for NdRange<3> {
                 &args.as_raw_arg_list(),
             )
         }
-        .into()
+        .map(Into::into)
     }
 }

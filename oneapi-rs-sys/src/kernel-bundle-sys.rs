@@ -26,11 +26,15 @@ pub mod ffi {
         fn create_kernel_bundle_from_source(
             ctxt: &Context,
             source: &str,
-        ) -> UniquePtr<SourceKernelBundle>;
-        fn build(source: &mut UniquePtr<SourceKernelBundle>) -> UniquePtr<ExecutableKernelBundle>;
+        ) -> Result<UniquePtr<SourceKernelBundle>>;
+
+        fn build(
+            source: &mut UniquePtr<SourceKernelBundle>,
+        ) -> Result<UniquePtr<ExecutableKernelBundle>>;
+
         fn get_kernel(
             bundle: &mut UniquePtr<ExecutableKernelBundle>,
             name: &str,
-        ) -> UniquePtr<Kernel>;
+        ) -> Result<UniquePtr<Kernel>>;
     }
 }
