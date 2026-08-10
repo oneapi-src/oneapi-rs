@@ -1,4 +1,4 @@
-# SYCL-rs
+# oneAPI-rs
 
 Rust bindings for SYCL and the Intel oneAPI programming environment.
 
