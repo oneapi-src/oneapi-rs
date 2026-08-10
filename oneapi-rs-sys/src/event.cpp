@@ -36,7 +36,7 @@ void register_callback(std::unique_ptr<Queue> &queue, Event const &event,
                        SharedWaker const *waker) {
   queue->submit([=](sycl::handler &cgh) {
     cgh.depends_on(event);
-    cgh.host_task([=]() { waker->wake(); });
+    cgh.host_task([=]() { wake(waker); });
   });
 }
 } // namespace sycl_shims::event

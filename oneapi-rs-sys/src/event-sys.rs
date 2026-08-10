@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::sync::{Arc, atomic::Ordering::Relaxed};
+
 use crate::types::SharedWaker;
 
 #[cxx::bridge(namespace = "sycl_shims::event")]
@@ -39,6 +41,16 @@ pub mod ffi {
 
     extern "Rust" {
         type SharedWaker;
-        fn wake(&self);
+        unsafe fn wake(ptr: *const SharedWaker);
+    }
+}
+
+// Safety: SharedWaker must by a pointer created by Arc::into_raw. The caller must increment the
+// SharedWaker's strong reference count before calling.
+unsafe fn wake(ptr: *const SharedWaker) {
+    unsafe {
+        (*ptr).done.store(true, Relaxed);
+        (*ptr).waker.wake();
+        Arc::decrement_strong_count(ptr);
     }
 }

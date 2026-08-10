@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
+use std::sync::atomic::AtomicBool;
 
 use futures::task::AtomicWaker;
 
@@ -21,11 +21,6 @@ impl SharedWaker {
             waker: AtomicWaker::new(),
             done: AtomicBool::new(false),
         }
-    }
-
-    pub fn wake(&self) {
-        self.done.store(true, Relaxed);
-        self.waker.wake();
     }
 }
 
