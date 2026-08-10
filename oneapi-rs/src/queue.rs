@@ -45,29 +45,29 @@ impl Queue {
     }
 
     /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
-    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> EnqueuedHostBuffer<T> {
+    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> Result<EnqueuedHostBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_host(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
     /// Allocates zeroed memory and creates a shared [`Buffer`] that can store an array of T.
-    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> EnqueuedSharedBuffer<T> {
+    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> Result<EnqueuedSharedBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_shared(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
     /// Allocates zeroed memory and creates a device [`Buffer`] that can store an array of T.
-    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> EnqueuedDeviceBuffer<T> {
+    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> Result<EnqueuedDeviceBuffer<T>> {
         unsafe {
             let mut buffer = self.alloc_uninit_device(len);
-            let event = self.memset(&mut buffer, 0);
-            EnqueuedBuffer::new(buffer, event)
+            self.memset(&mut buffer, 0)
+                .map(|event| EnqueuedBuffer::new(buffer, event))
         }
     }
 
@@ -98,7 +98,7 @@ impl Queue {
         &mut self,
         buffer: &mut Buffer<T, A>,
         value: i32,
-    ) -> Event {
+    ) -> Result<Event> {
         unsafe { self.memset_with_deps(buffer, value, &[]) }
     }
 
@@ -109,7 +109,7 @@ impl Queue {
         buffer: &mut Buffer<T, A>,
         value: i32,
         dep_events: &[&Event],
-    ) -> Event {
+    ) -> Result<Event> {
         let ptr = buffer.get_byte_ptr();
         let num_bytes = buffer.get_byte_size();
         let dep_events = dep_events
@@ -118,7 +118,7 @@ impl Queue {
                 ptr: (*e).clone().0,
             })
             .collect::<Vec<_>>();
-        unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }.into()
+        unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }.map(Into::into)
     }
 
     /// Submits a barrier to the queue.

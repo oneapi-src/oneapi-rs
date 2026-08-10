@@ -29,7 +29,7 @@ struct IotaArgs<'a> {
 
 fn main() -> oneapi_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut buffer = queue.alloc_shared::<f32>(1024).wait()?;
+    let mut buffer = queue.alloc_shared::<f32>(1024)?.wait()?;
 
     let kernel = queue
         .get_context()

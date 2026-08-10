@@ -24,7 +24,7 @@ void iota(float start, float *ptr) {
 #[tokio::main]
 async fn main() -> oneapi_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut device_buffer = queue.alloc_device::<f32>(1024).await?;
+    let mut device_buffer = queue.alloc_device::<f32>(1024)?.await?;
 
     let kernel = queue
         .get_context()
@@ -41,7 +41,7 @@ async fn main() -> oneapi_rs::Result<()> {
     }?
     .await?;
 
-    let mut host_buffer = queue.alloc_host::<f32>(1024).await?;
+    let mut host_buffer = queue.alloc_host::<f32>(1024)?.await?;
 
     queue.copy(&device_buffer, &mut host_buffer).await?;
 
