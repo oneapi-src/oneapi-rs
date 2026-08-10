@@ -31,49 +31,58 @@
 //! You must also source `setvars.sh` before running any SYCL program.
 //!
 //! ### Hello world
-//! 1. Create a [`Queue`](crate::queue::Queue). It's the main entry point to the SYCL API.
-//! ```rust,ignore
-//! let mut queue = Queue::new();
-//! ```
 //!
-//! 2. Create an [USM buffer](crate::buffer::Buffer) for your data.
-//! ```rust,ignore
-//! let mut device_buffer = queue.alloc_device::<f64>(1024).wait();
 //! ```
+//! # use sycl_rs::prelude::*;
 //!
-//! 3. Build a SYCL kernel.
-//! ```rust,ignore
-//! let kernel = queue
-//!     .get_context()
-//!     .create_kernel_bundle_from_source(IOTA_SRC)
-//!     .build()
-//!     .get_kernel("iota");
-//! ```
+//! # static IOTA_SRC: &str = r#"
+//! # #include <sycl/sycl.hpp>
+//! # namespace syclext = sycl::ext::oneapi;
+//! # namespace syclexp = sycl::ext::oneapi::experimental;
+//! #
+//! # extern "C"
+//! # SYCL_EXT_ONEAPI_FUNCTION_PROPERTY((syclexp::nd_range_kernel<1>))
+//! # void iota(float start, float *ptr) {
+//! #     size_t id = syclext::this_work_item::get_nd_item<1>().get_global_linear_id();
+//! #     ptr[id] = start + static_cast<float>(id);
+//! # }
+//! # "#;
+//! #
+//! fn main() -> sycl_rs::Result<()> {
+//!     // 1. Create a Queue. It's the main entry point to the SYCL API.
+//!     let mut queue = Queue::new();
+//!     let mut device_buffer = queue.alloc_device::<f32>(1024)?.wait()?;
 //!
-//! 4. Launch your kernel.
-//! ```rust,ignore
-//! unsafe {
-//!     queue.launch(
-//!         NdRange::new([1024], [16]),
-//!         &kernel,
-//!         (3.14, &mut device_buffer),
-//!     )
+//!     // 3. Build a SYCL kernel.
+//!     let kernel = queue
+//!         .get_context()
+//!         .create_kernel_bundle_from_source(IOTA_SRC)?
+//!         .build()?
+//!         .get_kernel("iota")?;
+//!
+//!     // 4. Launch your kernel.
+//!     unsafe {
+//!         queue.launch(
+//!             NdRange::new([1024], [16]),
+//!             &kernel,
+//!             (3.14_f32, &mut device_buffer),
+//!         )
+//!     }?
+//!     .wait()?;
+//!
+//!     let mut host_buffer = queue.alloc_host::<f32>(1024)?.wait()?;
+//!
+//!     // 5. Copy your data to the host.
+//!     queue.copy(&device_buffer, &mut host_buffer)?.wait()?;
+//!
+//!     // You can access your host data just like a normal Rust slice.
+//!     for e in host_buffer.iter() {
+//!         print!("{e} ");
+//!     }
+//!     println!();
+//!
+//!     Ok(())
 //! }
-//! .wait();
-//! ```
-//!
-//! 5. Copy your data to the host.
-//! ```rust,ignore
-//! let mut host_buffer = queue.alloc_host::<f64>(1024).wait();
-//! queue.copy(&device_buffer, &mut host_buffer).wait();
-//! ```
-//!
-//! You can access your host data just like a normal Rust slice.
-//! ```rust,ignore
-//! for e in host_buffer.iter() {
-//!     print!("{e} ");
-//! }
-//! println!();
 //! ```
 //!
 //! # Safety model
