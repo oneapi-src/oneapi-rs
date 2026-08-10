@@ -137,7 +137,8 @@ impl Queue {
         ffi::barrier(&mut self.0, dep_events).map(Into::into)
     }
 
-    /// Performs a blocking wait for the completion of all enqueued tasks in the queue.
+    /// Performs a blocking wait for the completion of all enqueued tasks in the queue. Returns an
+    /// error if a synchronous SYCL exception occurs.
     pub fn wait(&mut self) -> Result<()> {
         ffi::wait(&mut self.0)
     }

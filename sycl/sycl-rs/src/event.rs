@@ -21,6 +21,8 @@ use crate::{Result, info::InfoTarget, private::Sealed, queue::Queue};
 pub struct Event(pub(crate) cxx::UniquePtr<ffi::Event>);
 
 impl Event {
+    /// Performs a blocking wait for the event to complete. Returns an error if a synchronous SYCL
+    /// exception occurs.
     pub fn wait(&mut self) -> Result<()> {
         ffi::wait(&mut self.0)
     }
