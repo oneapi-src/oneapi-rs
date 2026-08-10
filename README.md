@@ -62,7 +62,7 @@ cargo run -p sycl-rs --example kernel_launch
 ## Documentation
 
 - [API documentation](https://oneapi-src.github.io/oneapi-rs/sycl_rs/)
-- [Examples](sycl-rs/examples)
+- [Examples](sycl/sycl-rs/examples)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 
