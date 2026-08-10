@@ -10,6 +10,10 @@ use std::{io::Error, path::PathBuf};
 use which::which;
 
 fn main() {
+    // We detect whether we're running in a docs.rs environment, If yes - we exit the build script
+    // because the docs.rs build container doesn't have oneAPI installed as a dependency.
+    // This allows us to build the documentation without having to build the whole library.
+    // https://docs.rs/about/builds#detecting-docsrs
     if std::env::var("DOCS_RS").is_ok() {
         return;
     }
