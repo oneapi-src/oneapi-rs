@@ -273,40 +273,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
 
 [[package]]
-name = "oneapi-rs"
-version = "0.1.0"
-dependencies = [
- "allocator-api2",
- "bytemuck",
- "cxx",
- "oneapi-rs-derive",
- "oneapi-rs-sys",
- "pin-project",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "oneapi-rs-derive"
-version = "0.1.0"
-dependencies = [
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn 3.0.3",
-]
-
-[[package]]
-name = "oneapi-rs-sys"
-version = "0.1.0"
-dependencies = [
- "cxx",
- "cxx-build",
- "futures",
- "which",
-]
-
-[[package]]
 name = "pin-project"
 version = "1.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -412,6 +378,40 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
+
+[[package]]
+name = "sycl-rs"
+version = "0.1.0"
+dependencies = [
+ "allocator-api2",
+ "bytemuck",
+ "cxx",
+ "pin-project",
+ "sycl-rs-derive",
+ "sycl-rs-sys",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "sycl-rs-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.3",
+]
+
+[[package]]
+name = "sycl-rs-sys"
+version = "0.1.0"
+dependencies = [
+ "cxx",
+ "cxx-build",
+ "futures",
+ "which",
+]
 
 [[package]]
 name = "syn"

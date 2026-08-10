@@ -1,4 +1,4 @@
-# Contributing to oneAPI-rs
+# Contributing to SYCL-rs
 
 ## Development setup
 
@@ -48,7 +48,7 @@ device.
 
 ## License
 
-oneAPI-rs is licensed under either the [Apache License 2.0](LICENSE-APACHE) or
+SYCL-rs is licensed under either the [Apache License 2.0](LICENSE-APACHE) or
 the [MIT License](LICENSE-MIT), at your option. By contributing to the project,
 you agree to the license and copyright terms therein and release your contribution
 under these terms.

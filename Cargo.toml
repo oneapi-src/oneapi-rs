@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["oneapi-rs", "oneapi-rs-derive", "oneapi-rs-sys"]
+members = ["sycl-rs", "sycl-rs-derive", "sycl-rs-sys"]
 
 [workspace.package]
 edition = "2024"
