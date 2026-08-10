@@ -62,8 +62,16 @@ impl Future for EventFuture {
             this.shared.waker.register(cx.waker());
             // Safety: the SharedWaker will always outlive the C++ host task.
             // Safety: the Future which holds the SharedWaker is pinned - the pointer will remain valid.
-            unsafe { ffi::register_callback(&mut queue.0, &this.event.0, this.shared) };
-            this.queue.replace(queue);
+            let result =
+                unsafe { ffi::register_callback(&mut queue.0, &this.event.0, this.shared) };
+            match result {
+                Ok(_) => {
+                    this.queue.replace(queue);
+                }
+                Err(_) => {
+                    return Poll::Ready(result);
+                }
+            }
         } else {
             // Quick check before registering to avoid wasting time
             if this.shared.done.load(Relaxed) {
