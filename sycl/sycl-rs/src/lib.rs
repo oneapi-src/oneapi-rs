@@ -99,6 +99,10 @@
 //! You can also synchronously call [`Queue::wait()`](crate::queue::Queue::wait) to wait for a
 //! [`Queue`](crate::queue::Queue) directly. To do the same asynchronously you have to `.await` an
 //! event returned by [`Queue::barrier()`](crate::queue::Queue::barrier).
+//!
+//! All basic SYCL wrapper types (`Queue`, `Event`, `Context`, `Platform`, `Device`) are thread safe as
+//! indicated by the provided [`Send`] and [`Sync`] trait implementations. However - Buffers are
+//! not thread-safe. If you need a thread-safe Buffer you need to wrap it in an `Arc<Mutex<T>>`.
 
 pub mod buffer;
 pub mod context;
