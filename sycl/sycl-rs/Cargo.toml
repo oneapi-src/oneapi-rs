@@ -1,6 +1,6 @@
 [package]
 name = "sycl-rs"
-version = "0.1.0"
+version = "0.0.9"
 description = "Rust bindings for SYCL"
 documentation = "https://docs.rs/sycl-rs"
 keywords = ["oneapi", "sycl", "gpu"]
@@ -22,8 +22,8 @@ homepage.workspace = true
 allocator-api2 = "0.4.0"
 bytemuck = "1.25.1"
 cxx = "1.0.194"
-sycl-rs-sys = { version = "0.1.0", path = "../sycl-rs-sys" }
-sycl-rs-derive = { version = "0.1.0", path = "../sycl-rs-derive" }
+sycl-rs-sys = { version = "0.0.9", path = "../sycl-rs-sys" }
+sycl-rs-derive = { version = "0.0.9", path = "../sycl-rs-derive" }
 pin-project = "1.1.13"
 thiserror = "2.0.18"
 
