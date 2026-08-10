@@ -18,7 +18,7 @@ GPUs, FPGAs …) on which code can be executed, and to manage data resources
 and code execution on those devices.
 
 Documentation of SYCL-rs including API description, architecture, and examples
-can be found at: <https://oneapi-src.github.io/oneapi-rs/sycl_rs/>
+can be found at: <https://docs.rs/sycl_rs/>
 
 ### Added
 
