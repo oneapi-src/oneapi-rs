@@ -1,9 +1,9 @@
-# oneAPI-rs
+# SYCL-rs
 
 Rust bindings for SYCL and the Intel oneAPI programming environment.
 
 > [!WARNING]
-> oneAPI-rs is experimental, has not released version 0.1.0, and is not ready
+> SYCL-rs is experimental, has not released version 0.1.0, and is not ready
 > for production use. Its API may change without notice.
 
 ## Supported platforms
@@ -49,20 +49,20 @@ List the SYCL devices visible to the runtime:
 
 ```bash
 source /opt/intel/oneapi/setvars.sh
-cargo run -p oneapi-rs --example sycl-ls
+cargo run -p sycl-rs --example sycl-ls
 ```
 
 The kernel launch examples demonstrate allocation, runtime kernel compilation,
 kernel submission, and copying results back to the host:
 
 ```bash
-cargo run -p oneapi-rs --example kernel_launch
+cargo run -p sycl-rs --example kernel_launch
 ```
 
 ## Documentation
 
-- [API documentation](https://oneapi-src.github.io/oneapi-rs/oneapi_rs/)
-- [Examples](oneapi-rs/examples)
+- [API documentation](https://oneapi-src.github.io/oneapi-rs/sycl_rs/)
+- [Examples](sycl/sycl-rs/examples)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
 

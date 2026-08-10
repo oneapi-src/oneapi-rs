@@ -1,0 +1,20 @@
+[package]
+name = "sycl-rs-sys"
+version = "0.1.0"
+description = "Internal SYCL FFI implementation for sycl-rs"
+publish = ["crates-io"]
+
+# Inherit settings from the root workspace
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+cxx = "1.0.194"
+futures = "0.3.33"
+
+[build-dependencies]
+cxx-build = "1.0.194"
+which = "8.0.4"
