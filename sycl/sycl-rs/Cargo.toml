@@ -1,6 +1,6 @@
 [package]
 name = "sycl-rs"
-version = "0.0.9"
+version = "0.0.10"
 description = "Rust bindings for SYCL"
 documentation = "https://docs.rs/sycl-rs"
 keywords = ["oneapi", "sycl", "gpu"]
@@ -10,6 +10,7 @@ categories = [
     "memory-management",
     "science"]
 publish = ["crates-io"]
+readme = "README.md"
 
 # Inherit settings from the root workspace
 edition.workspace = true
