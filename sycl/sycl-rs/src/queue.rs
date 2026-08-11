@@ -11,16 +11,16 @@ use bytemuck::Pod;
 use sycl_rs_sys::{queue::ffi, types::ffi::EventPtr};
 
 use crate::{
-    buffer::{
-        Buffer, DeviceBuffer, EnqueuedBuffer, EnqueuedDeviceBuffer, EnqueuedHostBuffer,
-        EnqueuedSharedBuffer, HostBuffer, SharedBuffer,
-    },
     context::Context,
     device::Device,
     event::Event,
     kernel::{Kernel, KernelArgumentList},
     range::{NdRange, ValidDimension},
     usm::{UsmAlloc, UsmAllocator},
+    usmbox::{
+        DeviceUsmBox, EnqueuedDeviceUsmBox, EnqueuedHostUsmBox, EnqueuedSharedUsmBox,
+        EnqueuedUsmBox, HostUsmBox, SharedUsmBox, UsmBox,
+    },
 };
 
 /// The `Queue` connects a host program to a single device. Programs submit tasks to a device via the
@@ -44,74 +44,74 @@ impl Queue {
         ffi::get_context(&self.0).into()
     }
 
-    /// Allocates zeroed memory and creates a host-side [`Buffer`] that can store an array of T.
-    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> Result<EnqueuedHostBuffer<T>> {
+    /// Allocates zeroed memory and creates a host-side [`UsmBox`] that can store an array of T.
+    pub fn alloc_host<T: Pod>(&mut self, len: usize) -> Result<EnqueuedHostUsmBox<T>> {
         unsafe {
-            let mut buffer = self.alloc_uninit_host(len);
-            self.memset(&mut buffer, 0)
-                .map(|event| EnqueuedBuffer::new(buffer, event))
+            let mut array = self.alloc_uninit_host(len);
+            self.memset(&mut array, 0)
+                .map(|event| EnqueuedUsmBox::new(array, event))
         }
     }
 
-    /// Allocates zeroed memory and creates a shared [`Buffer`] that can store an array of T.
-    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> Result<EnqueuedSharedBuffer<T>> {
+    /// Allocates zeroed memory and creates a shared [`UsmBox`] that can store an array of T.
+    pub fn alloc_shared<T: Pod>(&mut self, len: usize) -> Result<EnqueuedSharedUsmBox<T>> {
         unsafe {
-            let mut buffer = self.alloc_uninit_shared(len);
-            self.memset(&mut buffer, 0)
-                .map(|event| EnqueuedBuffer::new(buffer, event))
+            let mut array = self.alloc_uninit_shared(len);
+            self.memset(&mut array, 0)
+                .map(|event| EnqueuedUsmBox::new(array, event))
         }
     }
 
-    /// Allocates zeroed memory and creates a device [`Buffer`] that can store an array of T.
-    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> Result<EnqueuedDeviceBuffer<T>> {
+    /// Allocates zeroed memory and creates a device [`UsmBox`] that can store an array of T.
+    pub fn alloc_device<T: Pod>(&mut self, len: usize) -> Result<EnqueuedDeviceUsmBox<T>> {
         unsafe {
-            let mut buffer = self.alloc_uninit_device(len);
-            self.memset(&mut buffer, 0)
-                .map(|event| EnqueuedBuffer::new(buffer, event))
+            let mut array = self.alloc_uninit_device(len);
+            self.memset(&mut array, 0)
+                .map(|event| EnqueuedUsmBox::new(array, event))
         }
     }
 
-    /// Allocates memory and creates a host-side [`Buffer`] that can store an array of T.
-    /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_host<T>(&self, len: usize) -> HostBuffer<T> {
+    /// Allocates memory and creates a host-side [`UsmBox`] that can store an array of T.
+    /// Safety: the array contents are uninitialized.
+    pub unsafe fn alloc_uninit_host<T>(&self, len: usize) -> HostUsmBox<T> {
         let allocator = UsmAllocator::from(self);
-        unsafe { Buffer::new(allocator, len) }
+        unsafe { UsmBox::new(allocator, len) }
     }
 
-    /// Allocates memory and creates a shared [`Buffer`] that can store an array of T.
-    /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_shared<T>(&self, len: usize) -> SharedBuffer<T> {
+    /// Allocates memory and creates a shared [`UsmBox`] that can store an array of T.
+    /// Safety: the array contents are uninitialized.
+    pub unsafe fn alloc_uninit_shared<T>(&self, len: usize) -> SharedUsmBox<T> {
         let allocator = UsmAllocator::from(self);
-        unsafe { Buffer::new(allocator, len) }
+        unsafe { UsmBox::new(allocator, len) }
     }
 
-    /// Allocates memory and creates a device-side [`Buffer`] that can store an array of T.
-    /// Safety: the buffer contents are uninitialized.
-    pub unsafe fn alloc_uninit_device<T>(&self, len: usize) -> DeviceBuffer<T> {
+    /// Allocates memory and creates a device-side [`UsmBox`] that can store an array of T.
+    /// Safety: the array contents are uninitialized.
+    pub unsafe fn alloc_uninit_device<T>(&self, len: usize) -> DeviceUsmBox<T> {
         let allocator = UsmAllocator::from(self);
-        unsafe { Buffer::new(allocator, len) }
+        unsafe { UsmBox::new(allocator, len) }
     }
 
     /// Sets memory allocated with USM allocations.
     /// Safety: the caller must make sure the underlying memory isn't being aliased somewhere else.
     pub unsafe fn memset<T, A: UsmAlloc>(
         &mut self,
-        buffer: &mut Buffer<T, A>,
+        array: &mut UsmBox<T, A>,
         value: i32,
     ) -> Result<Event> {
-        unsafe { self.memset_with_deps(buffer, value, &[]) }
+        unsafe { self.memset_with_deps(array, value, &[]) }
     }
 
     /// Sets memory allocated with USM allocations after all specified events finish.
     /// Safety: the caller must make sure the underlying memory isn't being aliased somewhere else.
     pub unsafe fn memset_with_deps<T, A: UsmAlloc>(
         &mut self,
-        buffer: &mut Buffer<T, A>,
+        array: &mut UsmBox<T, A>,
         value: i32,
         dep_events: &[&Event],
     ) -> Result<Event> {
-        let ptr = buffer.get_byte_ptr();
-        let num_bytes = buffer.get_byte_size();
+        let ptr = array.get_byte_ptr();
+        let num_bytes = array.get_byte_size();
         let dep_events = dep_events
             .iter()
             .map(|e| EventPtr {
@@ -162,10 +162,10 @@ impl Queue {
         unsafe { nd_range.launch(self, kernel, args) }
     }
 
-    /// Copies the contents of the source buffer to the destination buffer.
+    /// Copies the contents of the source array to the destination array.
     ///
-    /// Panics if the source and destination buffer lengths differ.
-    pub fn copy<T, A1, A2>(&mut self, src: &Buffer<T, A1>, dst: &mut Buffer<T, A2>) -> Result<Event>
+    /// Panics if the source and destination array lengths differ.
+    pub fn copy<T, A1, A2>(&mut self, src: &UsmBox<T, A1>, dst: &mut UsmBox<T, A2>) -> Result<Event>
     where
         T: Pod,
         A1: UsmAlloc,
@@ -174,14 +174,14 @@ impl Queue {
         self.copy_with_deps(src, dst, &[])
     }
 
-    /// Copies the contents of the source buffer to the destination buffer after all specified
+    /// Copies the contents of the source array to the destination array after all specified
     /// events finish.
     ///
-    /// Panics if the source and destination buffer lengths differ.
+    /// Panics if the source and destination array lengths differ.
     pub fn copy_with_deps<T, A1, A2>(
         &mut self,
-        src: &Buffer<T, A1>,
-        dst: &mut Buffer<T, A2>,
+        src: &UsmBox<T, A1>,
+        dst: &mut UsmBox<T, A2>,
         dep_events: &[&Event],
     ) -> Result<Event>
     where
@@ -192,7 +192,7 @@ impl Queue {
         assert_eq!(
             src.get_len(),
             dst.get_len(),
-            "source and destination buffer lengths differ"
+            "source and destination array lengths differ"
         );
 
         // TODO: Resolve the C++ lifetime elision issue

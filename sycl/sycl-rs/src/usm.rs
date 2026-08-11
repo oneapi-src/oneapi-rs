@@ -68,7 +68,7 @@ unsafe impl<T: UsmAllocatorKind> Allocator for UsmAllocator<T> {
     }
 }
 
-/// An allocator for Device-side buffers
+/// An allocator for Device-side arrays
 ///
 /// Safety: memory allocated by this allocator cannot be accessed on the host side
 #[allow(dead_code)]
@@ -80,7 +80,7 @@ impl UsmAllocatorKind for DeviceAllocator {
     }
 }
 
-/// An allocator for Host-side buffers
+/// An allocator for Host-side arrays
 pub struct HostAllocator;
 
 impl UsmAllocatorKind for HostAllocator {
@@ -91,7 +91,7 @@ impl UsmAllocatorKind for HostAllocator {
 
 unsafe impl HostAccessible for UsmAllocator<HostAllocator> {}
 
-/// An allocator for shared memory buffers
+/// An allocator for shared memory arrays
 pub struct SharedAllocator;
 
 impl UsmAllocatorKind for SharedAllocator {

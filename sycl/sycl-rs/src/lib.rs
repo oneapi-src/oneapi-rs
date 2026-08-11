@@ -55,7 +55,7 @@
 //! fn main() -> sycl_rs::Result<()> {
 //!     // 1. Create a Queue. It's the main entry point to the SYCL API.
 //!     let mut queue = Queue::new();
-//!     let mut device_buffer = queue.alloc_device::<f32>(1024)?.wait()?;
+//!     let mut device_array = queue.alloc_device::<f32>(1024)?.wait()?;
 //!
 //!     // 3. Build a SYCL kernel.
 //!     let kernel = queue
@@ -69,18 +69,18 @@
 //!         queue.launch(
 //!             NdRange::new([1024], [16]),
 //!             &kernel,
-//!             (3.14_f32, &mut device_buffer),
+//!             (3.14_f32, &mut device_array),
 //!         )
 //!     }?
 //!     .wait()?;
 //!
-//!     let mut host_buffer = queue.alloc_host::<f32>(1024)?.wait()?;
+//!     let mut host_array = queue.alloc_host::<f32>(1024)?.wait()?;
 //!
 //!     // 5. Copy your data to the host.
-//!     queue.copy(&device_buffer, &mut host_buffer)?.wait()?;
+//!     queue.copy(&device_array, &mut host_array)?.wait()?;
 //!
 //!     // You can access your host data just like a normal Rust slice.
-//!     for e in host_buffer.iter() {
+//!     for e in host_array.iter() {
 //!         print!("{e} ");
 //!     }
 //!     println!();
@@ -90,10 +90,11 @@
 //! ```
 //!
 //! # Safety model
-//! - USM allocations are represented by a zero-cost `Buffer` type managed through RAII.
-//!   - Note: Unlike SYCL buffers, SYCL-rs buffers do not rely on accessors.
-//! - Buffers are zero-initialized by default.
-//! - Buffers can only store types that implement [`bytemuck::Pod`].
+//! - USM allocations are represented by a zero-cost [`UsmBox`](crate::usmbox::UsmBox) type managed
+//!   through RAII.
+//!   - Note: `UsmBox` arrays do not rely on accessors, unlike SYCL buffers.
+//! - `UsmBox`es are zero-initialized by default.
+//! - `UsmBox`es can only store types that implement [`bytemuck::Pod`].
 //! - Kernel launch is inherently unsafe. In particular, the caller must ensure that every argument
 //!   has the correct representation, layout, and alignment.
 //!
@@ -106,8 +107,8 @@
 //! event returned by [`Queue::barrier()`](crate::queue::Queue::barrier).
 //!
 //! All basic SYCL wrapper types (`Queue`, `Event`, `Context`, `Platform`, `Device`) are thread safe as
-//! indicated by the provided [`Send`] and [`Sync`] trait implementations. However - Buffers are
-//! not thread-safe. If you need a thread-safe Buffer you need to wrap it in an `Arc<Mutex<T>>`.
+//! indicated by the provided [`Send`] and [`Sync`] trait implementations. However - `UsmBox`es are
+//! not thread-safe. If you need a thread-safe `UsmBox` you need to wrap it in an `Arc<Mutex<T>>`.
 //!
 //! # Required extensions
 //! This project requires the following SYCL extensions to work:
@@ -118,7 +119,6 @@
 //! - [sycl_ext_intel_queue_immediate_command_list](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/supported/sycl_ext_intel_queue_immediate_command_list.asciidoc)
 //! - [sycl_ext_oneapi_enqueue_barrier](https://github.com/intel/llvm/blob/sycl/sycl/doc/extensions/supported/sycl_ext_oneapi_enqueue_barrier.asciidoc)
 
-pub mod buffer;
 pub mod context;
 pub mod device;
 pub mod event;
@@ -129,6 +129,7 @@ pub mod prelude;
 pub mod queue;
 pub mod range;
 pub mod usm;
+pub mod usmbox;
 
 pub type SyclError = cxx::Exception;
 pub type Result<T> = std::result::Result<T, SyclError>;

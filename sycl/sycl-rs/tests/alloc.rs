@@ -11,11 +11,11 @@ use sycl_rs::queue::Queue;
 #[test]
 fn shared_allocation_host_values() {
     let queue = Queue::new();
-    let mut buffer = unsafe { queue.alloc_uninit_shared::<u32>(10) };
+    let mut array = unsafe { queue.alloc_uninit_shared::<u32>(10) };
 
-    for (index, value) in buffer.iter_mut().enumerate() {
+    for (index, value) in array.iter_mut().enumerate() {
         *value = index as u32;
     }
 
-    assert_eq!(buffer.as_ref(), &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    assert_eq!(array.as_ref(), &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 }

@@ -24,12 +24,12 @@ void iota(float start, float *ptr) {
 #[derive(KernelArgumentList)]
 struct IotaArgs<'a> {
     start: f32,
-    ptr: &'a mut SharedBuffer<f32>,
+    ptr: &'a mut SharedUsmBox<f32>,
 }
 
 fn main() -> sycl_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut buffer = queue.alloc_shared::<f32>(1024)?.wait()?;
+    let mut array = queue.alloc_shared::<f32>(1024)?.wait()?;
 
     let kernel = queue
         .get_context()
@@ -43,13 +43,13 @@ fn main() -> sycl_rs::Result<()> {
             &kernel,
             IotaArgs {
                 start: 3.14_f32,
-                ptr: &mut buffer,
+                ptr: &mut array,
             },
         )
     }?
     .wait()?;
 
-    for e in buffer.iter() {
+    for e in array.iter() {
         print!("{e} ");
     }
     println!();
