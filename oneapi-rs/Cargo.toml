@@ -1,0 +1,12 @@
+[package]
+name = "oneapi-rs"
+version = "0.0.9"
+readme = "README.md"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+sycl-rs = { version = "0.0.9", path = "../sycl/sycl-rs" }
