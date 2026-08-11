@@ -24,7 +24,7 @@ void iota(float start, float *ptr) {
 #[tokio::main]
 async fn main() -> sycl_rs::Result<()> {
     let mut queue = Queue::new();
-    let mut device_buffer = queue.alloc_device::<f32>(1024)?.await?;
+    let mut device_array = queue.alloc_device::<f32>(1024)?.await?;
 
     let kernel = queue
         .get_context()
@@ -36,16 +36,16 @@ async fn main() -> sycl_rs::Result<()> {
         queue.launch(
             NdRange::new([1024], [16]),
             &kernel,
-            (3.14_f32, &mut device_buffer),
+            (3.14_f32, &mut device_array),
         )
     }?
     .await?;
 
-    let mut host_buffer = queue.alloc_host::<f32>(1024)?.await?;
+    let mut host_array = queue.alloc_host::<f32>(1024)?.await?;
 
-    queue.copy(&device_buffer, &mut host_buffer)?.await?;
+    queue.copy(&device_array, &mut host_array)?.await?;
 
-    for e in host_buffer.iter() {
+    for e in host_array.iter() {
         print!("{e} ");
     }
     println!();

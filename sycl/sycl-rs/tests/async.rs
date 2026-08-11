@@ -11,9 +11,9 @@ use sycl_rs::queue::Queue;
 #[tokio::test]
 async fn check_for_select_support() -> sycl_rs::Result<()> {
     let mut queue = Queue::new();
-    let _selected_buffer = tokio::select! {
-        buffer1 = queue.alloc_device::<f32>(1024)? => buffer1,
-        buffer2 = queue.alloc_device::<f32>(10240)? => buffer2
+    let _selected_array = tokio::select! {
+        array1 = queue.alloc_device::<f32>(1024)? => array1,
+        array2 = queue.alloc_device::<f32>(10240)? => array2
     };
 
     Ok(())
