@@ -1,6 +1,6 @@
 [package]
 name = "sycl-rs"
-version = "0.0.10"
+version = "0.1.0"
 description = "Rust bindings for SYCL"
 documentation = "https://docs.rs/sycl-rs"
 keywords = ["oneapi", "sycl", "gpu"]
