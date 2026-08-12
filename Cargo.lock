@@ -402,7 +402,7 @@ dependencies = [
 
 [[package]]
 name = "sycl-rs-derive"
-version = "0.0.9"
+version = "0.1.0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -412,7 +412,7 @@ dependencies = [
 
 [[package]]
 name = "sycl-rs-sys"
-version = "0.0.9"
+version = "0.1.0"
 dependencies = [
  "cxx",
  "cxx-build",
