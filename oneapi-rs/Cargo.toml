@@ -1,7 +1,18 @@
 [package]
 name = "oneapi-rs"
 version = "0.1.0"
+description = "Rust bindings for oneAPI"
+documentation = "https://docs.rs/oneapi-rs"
+keywords = ["oneapi", "sycl", "gpu"]
+categories = [
+    "api-bindings",
+    "hardware-support",
+    "memory-management",
+    "science"]
+publish = ["crates-io"]
 readme = "README.md"
+
+# Inherit settings from the root workspace
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
