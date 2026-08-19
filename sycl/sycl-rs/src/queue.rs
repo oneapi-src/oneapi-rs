@@ -223,6 +223,14 @@ impl From<&Device> for Queue {
     }
 }
 
+impl From<(&Context, &Device)> for Queue {
+    fn from(value: (&Context, &Device)) -> Self {
+        Self(ffi::new_queue_from_context_and_device(
+            &value.0.0, &value.1.0,
+        ))
+    }
+}
+
 impl From<cxx::UniquePtr<ffi::Queue>> for Queue {
     fn from(value: cxx::UniquePtr<ffi::Queue>) -> Self {
         Self(value)
