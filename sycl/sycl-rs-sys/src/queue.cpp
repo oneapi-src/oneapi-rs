@@ -30,6 +30,11 @@ std::unique_ptr<Queue> new_queue_from_device(Device const &device) {
   return std::make_unique<Queue>(sycl::queue(device, {in_order()}));
 }
 
+std::unique_ptr<Queue> new_queue_from_context_and_device(Context const &context,
+                                                         Device const &device) {
+  return std::make_unique<Queue>(sycl::queue(context, device, {in_order()}));
+}
+
 std::unique_ptr<Context> get_context(Queue const &queue) {
   return std::make_unique<Context>(queue.get_context());
 }
