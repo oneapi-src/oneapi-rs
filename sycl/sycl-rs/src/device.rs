@@ -69,6 +69,11 @@ impl Device {
     pub fn enable_peer_access(&mut self, peer: &Device) -> Result<()> {
         ffi::enable_peer_access(&mut self.0, &peer.0)
     }
+
+    /// Disables access to the peer device’s memory from this device.
+    pub fn disable_peer_access(&mut self, peer: &Device) -> Result<()> {
+        ffi::disable_peer_access(&mut self.0, &peer.0)
+    }
 }
 
 impl Clone for Device {
