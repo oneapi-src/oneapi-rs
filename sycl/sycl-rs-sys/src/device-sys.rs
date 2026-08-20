@@ -15,6 +15,7 @@ pub mod ffi {
         type PlatformPtr = crate::types::ffi::PlatformPtr;
         type DeviceType = crate::types::ffi::DeviceType;
         type Aspect = crate::types::ffi::Aspect;
+        type PeerAccess = crate::types::ffi::PeerAccess;
     }
 
     unsafe extern "C++" {
