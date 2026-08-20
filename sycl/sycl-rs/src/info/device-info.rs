@@ -6,10 +6,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
-use crate::device::Device;
-use crate::info::Info;
-use crate::private::Sealed;
 use sycl_rs_sys::device::ffi;
+
+use crate::{
+    device::{Aspect, Device},
+    info::Info,
+    private::Sealed,
+};
 
 /// Returns the device type associated with the device. May not return `sycl_rs::info::DeviceType::All`
 pub struct DeviceType;
@@ -41,5 +44,21 @@ impl Info for Name {
     type Target = Device;
     fn get_item(target: &Self::Target) -> Self::Item {
         ffi::get_name(&target.0)
+    }
+}
+
+/// Returns the PCI BDF address reported by the Intel SYCL extension.
+/// Panics when the device does not support the extension.
+pub struct PciBdfAddress;
+impl Sealed for PciBdfAddress {}
+impl Info for PciBdfAddress {
+    type Item = String;
+    type Target = Device;
+    fn get_item(target: &Self::Target) -> Self::Item {
+        assert!(
+            target.has(Aspect::ExtIntelPciAddress),
+            "device does not support the Intel PCI address extension"
+        );
+        ffi::get_pci_bdf_address(&target.0)
     }
 }

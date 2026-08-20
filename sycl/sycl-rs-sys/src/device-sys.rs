@@ -14,6 +14,7 @@ pub mod ffi {
         type DevicePtr = crate::types::ffi::DevicePtr;
         type PlatformPtr = crate::types::ffi::PlatformPtr;
         type DeviceType = crate::types::ffi::DeviceType;
+        type Aspect = crate::types::ffi::Aspect;
     }
 
     unsafe extern "C++" {
@@ -25,12 +26,13 @@ pub mod ffi {
         type Platform = crate::types::ffi::Platform;
 
         fn get_devices() -> Vec<DevicePtr>;
-
         fn get_platform(device: &Device) -> UniquePtr<Platform>;
-
         fn get_device_type(device: &Device) -> DeviceType;
         fn get_version(device: &Device) -> String;
         fn get_name(device: &Device) -> String;
+        fn get_pci_bdf_address(device: &Device) -> String;
+
         fn clone(device: &Device) -> UniquePtr<Device>;
+        fn has(device: &Device, aspect: Aspect) -> bool;
     }
 }

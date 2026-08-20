@@ -39,12 +39,25 @@ DeviceType get_device_type(Device const &device) {
   }
 }
 
+bool has(Device const &device, Aspect aspect) {
+  switch (aspect) {
+  case Aspect::ExtIntelPciAddress:
+    return device.has(sycl::aspect::ext_intel_pci_address);
+  }
+
+  return false;
+}
+
 rust::String get_version(Device const &device) {
   return device.get_info<sycl::info::device::version>();
 }
 
 rust::String get_name(Device const &device) {
   return device.get_info<sycl::info::device::name>();
+}
+
+rust::String get_pci_bdf_address(Device const &device) {
+  return device.get_info<sycl::ext::intel::info::device::pci_address>();
 }
 
 std::unique_ptr<Platform> get_platform(Device const &device) {
