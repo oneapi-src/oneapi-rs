@@ -34,6 +34,10 @@ pub mod ffi {
         fn new_queue() -> UniquePtr<Queue>;
         fn new_queue_immediate() -> UniquePtr<Queue>;
         fn new_queue_from_device(device: &Device) -> UniquePtr<Queue>;
+        fn new_queue_from_context_and_device(
+            context: &Context,
+            device: &Device,
+        ) -> UniquePtr<Queue>;
         fn get_context(queue: &Queue) -> UniquePtr<Context>;
         fn clone(queue: &Queue) -> UniquePtr<Queue>;
 
