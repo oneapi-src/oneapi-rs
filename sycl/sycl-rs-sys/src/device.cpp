@@ -70,6 +70,14 @@ std::unique_ptr<Device> clone(Device const &device) {
   return std::make_unique<Device>(sycl::device(device));
 }
 
+void enable_peer_access(std::unique_ptr<Device> &device, Device const &peer) {
+  return device->ext_oneapi_enable_peer_access(peer);
+}
+
+void disable_peer_access(std::unique_ptr<Device> &device, Device const &peer) {
+  return device->ext_oneapi_disable_peer_access(peer);
+}
+
 bool can_access_peer(std::unique_ptr<Device> &device, Device const &peer,
                      PeerAccess value) {
   syclext::peer_access access;
@@ -80,9 +88,5 @@ bool can_access_peer(std::unique_ptr<Device> &device, Device const &peer,
     access = syclext::peer_access::atomics_supported;
   }
   return device->ext_oneapi_can_access_peer(peer, access);
-}
-
-void enable_peer_access(std::unique_ptr<Device> &device, Device const &peer) {
-  return device->ext_oneapi_enable_peer_access(peer);
 }
 } // namespace sycl_shims::device
