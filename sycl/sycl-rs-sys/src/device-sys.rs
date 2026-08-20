@@ -39,6 +39,8 @@ pub mod ffi {
             value: PeerAccess,
         ) -> bool;
 
+        fn enable_peer_access(device: &mut UniquePtr<Device>, peer: &Device) -> Result<()>;
+
         fn clone(device: &Device) -> UniquePtr<Device>;
         fn has(device: &Device, aspect: Aspect) -> bool;
     }

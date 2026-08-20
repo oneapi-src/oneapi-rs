@@ -81,4 +81,8 @@ bool can_access_peer(std::unique_ptr<Device> &device, Device const &peer,
   }
   return device->ext_oneapi_can_access_peer(peer, access);
 }
+
+void enable_peer_access(std::unique_ptr<Device> &device, Device const &peer) {
+  return device->ext_oneapi_enable_peer_access(peer);
+}
 } // namespace sycl_shims::device

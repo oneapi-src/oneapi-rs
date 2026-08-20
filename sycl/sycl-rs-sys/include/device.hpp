@@ -33,4 +33,5 @@ std::unique_ptr<Device> clone(Device const &);
 bool has(Device const &, Aspect);
 
 bool can_access_peer(std::unique_ptr<Device> &, Device const &peer, PeerAccess);
+void enable_peer_access(std::unique_ptr<Device> &, Device const &peer);
 } // namespace sycl_shims::device
