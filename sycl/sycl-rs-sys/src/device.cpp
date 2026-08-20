@@ -13,6 +13,8 @@
 using sycl_shims::utils::vector_to_vec;
 using dt = sycl::info::device_type;
 
+namespace syclext = sycl::ext::oneapi;
+
 namespace sycl_shims::device {
 rust::Vec<DevicePtr> get_devices() {
   return vector_to_vec<DevicePtr>(sycl::device::get_devices());
@@ -66,5 +68,17 @@ std::unique_ptr<Platform> get_platform(Device const &device) {
 
 std::unique_ptr<Device> clone(Device const &device) {
   return std::make_unique<Device>(sycl::device(device));
+}
+
+bool can_access_peer(std::unique_ptr<Device> &device, Device const &peer,
+                     PeerAccess value) {
+  syclext::peer_access access;
+  switch (value) {
+  case PeerAccess::AccessSupported:
+    access = syclext::peer_access::access_supported;
+  case PeerAccess::AtomicsSupported:
+    access = syclext::peer_access::atomics_supported;
+  }
+  return device->ext_oneapi_can_access_peer(peer, access);
 }
 } // namespace sycl_shims::device

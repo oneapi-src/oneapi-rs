@@ -18,6 +18,7 @@ struct DevicePtr;
 struct PlatformPtr;
 enum class DeviceType : std::uint8_t;
 enum class Aspect : std::uint8_t;
+enum class PeerAccess : std::uint8_t;
 } // namespace sycl_shims
 
 namespace sycl_shims::device {
@@ -30,4 +31,6 @@ std::unique_ptr<Platform> get_platform(Device const &);
 
 std::unique_ptr<Device> clone(Device const &);
 bool has(Device const &, Aspect);
+
+bool can_access_peer(std::unique_ptr<Device> &, Device const &peer, PeerAccess);
 } // namespace sycl_shims::device
