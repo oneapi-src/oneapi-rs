@@ -8,7 +8,7 @@
 
 pub use crate::{
     context::Context,
-    device::Device,
+    device::{Aspect, Device},
     info::{self, InfoTarget},
     kernel::{Kernel, KernelArgument, KernelArgumentList},
     platform::Platform,

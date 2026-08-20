@@ -8,6 +8,8 @@
 
 use sycl_rs_sys::device::ffi;
 
+pub use sycl_rs_sys::types::ffi::Aspect;
+
 use crate::{info::InfoTarget, platform::Platform, private::Sealed};
 
 /// The `Device` struct encapsulates a single SYCL device on which kernels can be executed.
@@ -38,6 +40,11 @@ impl Device {
     pub fn get_platform(&self) -> Platform {
         let raw_platform = ffi::get_platform(&self.0);
         Platform(raw_platform)
+    }
+
+    /// Returns whether this device has the requested aspect.
+    pub fn has(&self, aspect: Aspect) -> bool {
+        ffi::has(&self.0, aspect)
     }
 }
 
