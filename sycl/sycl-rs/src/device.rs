@@ -8,9 +8,9 @@
 
 use sycl_rs_sys::device::ffi;
 
-pub use sycl_rs_sys::types::ffi::Aspect;
+pub use sycl_rs_sys::types::ffi::{Aspect, PeerAccess};
 
-use crate::{info::InfoTarget, platform::Platform, private::Sealed};
+use crate::{Result, info::InfoTarget, platform::Platform, private::Sealed};
 
 /// The `Device` struct encapsulates a single SYCL device on which kernels can be executed.
 ///
@@ -45,6 +45,34 @@ impl Device {
     /// Returns whether this device has the requested aspect.
     pub fn has(&self, aspect: Aspect) -> bool {
         ffi::has(&self.0, aspect)
+    }
+
+    /// Queries the peer access status between this device and `peer` according to the query
+    /// `value`.
+    ///
+    /// [`PeerAccess::AccessSupported`]: Returns true only if it is possible for this device to
+    /// enable peer access to USM device memory allocations located on the peer device.
+    ///
+    /// [`PeerAccess::AtomicsSupported`]: When this query returns true, it indicates that this
+    /// device may concurrently access and atomically modify USM device memory allocations located
+    /// on the peer device when peer access is enabled to that device.
+    pub fn can_access_peer(&mut self, peer: &Device, value: PeerAccess) -> bool {
+        ffi::can_access_peer(&mut self.0, &peer.0, value)
+    }
+
+    /// Enables this device to access USM device allocations located on the peer device.
+    /// This does not permit the peer device to access this device’s memory.
+    ///
+    /// Once this access is enabled, SYCL kernel functions and the explicit memory functions may
+    /// access USM device allocations on the peer device subject to the normal rules about context
+    /// as described in the core SYCL specification.
+    pub fn enable_peer_access(&mut self, peer: &Device) -> Result<()> {
+        ffi::enable_peer_access(&mut self.0, &peer.0)
+    }
+
+    /// Disables access to the peer device’s memory from this device.
+    pub fn disable_peer_access(&mut self, peer: &Device) -> Result<()> {
+        ffi::disable_peer_access(&mut self.0, &peer.0)
     }
 }
 

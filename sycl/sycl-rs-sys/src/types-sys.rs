@@ -78,6 +78,12 @@ pub mod ffi {
         Unknown,
     }
 
+    #[derive(Debug, Hash)]
+    enum PeerAccess {
+        AccessSupported,
+        AtomicsSupported,
+    }
+
     // cxx doesn't support const generic parameters
     struct Range1 {
         data: [u64; 1],

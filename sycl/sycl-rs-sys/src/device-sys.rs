@@ -15,6 +15,7 @@ pub mod ffi {
         type PlatformPtr = crate::types::ffi::PlatformPtr;
         type DeviceType = crate::types::ffi::DeviceType;
         type Aspect = crate::types::ffi::Aspect;
+        type PeerAccess = crate::types::ffi::PeerAccess;
     }
 
     unsafe extern "C++" {
@@ -31,6 +32,14 @@ pub mod ffi {
         fn get_version(device: &Device) -> String;
         fn get_name(device: &Device) -> String;
         fn get_pci_bdf_address(device: &Device) -> String;
+
+        fn enable_peer_access(device: &mut UniquePtr<Device>, peer: &Device) -> Result<()>;
+        fn disable_peer_access(device: &mut UniquePtr<Device>, peer: &Device) -> Result<()>;
+        fn can_access_peer(
+            device: &mut UniquePtr<Device>,
+            peer: &Device,
+            value: PeerAccess,
+        ) -> bool;
 
         fn clone(device: &Device) -> UniquePtr<Device>;
         fn has(device: &Device, aspect: Aspect) -> bool;
