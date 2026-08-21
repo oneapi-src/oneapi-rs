@@ -38,7 +38,10 @@ pub mod ffi {
             context: &Context,
             device: &Device,
         ) -> UniquePtr<Queue>;
+
         fn get_context(queue: &Queue) -> UniquePtr<Context>;
+        fn get_device(queue: &Queue) -> UniquePtr<Device>;
+
         fn clone(queue: &Queue) -> UniquePtr<Queue>;
 
         unsafe fn memset(
