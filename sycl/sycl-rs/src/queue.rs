@@ -44,6 +44,11 @@ impl Queue {
         ffi::get_context(&self.0).into()
     }
 
+    /// Returns the device the queue is associated with.
+    pub fn get_device(&self) -> Device {
+        ffi::get_device(&self.0).into()
+    }
+
     /// Allocates zeroed memory and creates a host-side [`UsmBox`] that can store an array of T.
     pub fn alloc_host<T: Pod>(&mut self, len: usize) -> Result<EnqueuedHostUsmBox<T>> {
         unsafe {
