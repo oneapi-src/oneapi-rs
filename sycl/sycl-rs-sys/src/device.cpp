@@ -45,6 +45,8 @@ bool has(Device const &device, Aspect aspect) {
   switch (aspect) {
   case Aspect::ExtIntelPciAddress:
     return device.has(sycl::aspect::ext_intel_pci_address);
+  case Aspect::ExtOneapiIsIntegratedGpu:
+    return device.has(sycl::aspect::ext_oneapi_is_integrated_gpu);
   }
 
   return false;

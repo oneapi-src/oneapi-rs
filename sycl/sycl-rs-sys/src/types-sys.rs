@@ -56,7 +56,10 @@ pub mod ffi {
 
     #[derive(Debug, Hash)]
     enum Aspect {
+        /// Indicates that the device supports the `PciBdfAddress` information descriptor.
         ExtIntelPciAddress,
+        /// Indicates that the implementation identifies this device as integrated GPU.
+        ExtOneapiIsIntegratedGpu,
     }
 
     #[derive(Debug, Hash)]
