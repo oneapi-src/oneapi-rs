@@ -57,6 +57,7 @@ pub mod ffi {
     #[derive(Debug, Hash)]
     enum Aspect {
         ExtIntelPciAddress,
+        ExtOneapiIsIntegratedGpu,
     }
 
     #[derive(Debug, Hash)]
