@@ -26,7 +26,10 @@ std::unique_ptr<Queue> new_queue_immediate();
 std::unique_ptr<Queue> new_queue_from_device(Device const &);
 std::unique_ptr<Queue> new_queue_from_context_and_device(Context const &,
                                                          Device const &);
+
 std::unique_ptr<Context> get_context(Queue const &);
+std::unique_ptr<Device> get_device(Queue const &);
+
 std::unique_ptr<Queue> clone(Queue const &);
 std::unique_ptr<Event> memset(std::unique_ptr<Queue> &, std::uint8_t *ptr,
                               int value, std::size_t num_bytes,
