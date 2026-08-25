@@ -29,4 +29,5 @@ pin-project = "1.1.13"
 thiserror = "2.0.18"
 
 [dev-dependencies]
+half = { version = "2.7.1", features = ["bytemuck"] }
 tokio = { version = "1.52.3", features = ["macros", "rt", "rt-multi-thread"] }
