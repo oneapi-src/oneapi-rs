@@ -29,5 +29,10 @@ pin-project = "1.1.13"
 thiserror = "2.0.18"
 
 [dev-dependencies]
+criterion = { version = "0.7.0", features = ["html_reports"] }
 half = { version = "2.7.1", features = ["bytemuck"] }
 tokio = { version = "1.52.3", features = ["macros", "rt", "rt-multi-thread"] }
+
+[[bench]]
+name = "batch_memcpy"
+harness = false
