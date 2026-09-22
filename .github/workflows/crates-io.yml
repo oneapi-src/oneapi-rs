@@ -1,0 +1,79 @@
+name: "Crates.io setup test"
+
+on:
+  push:
+    branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ["oneapi-rs", "Linux"]
+
+    steps:
+    - name: Checkout repository
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+    - name: Check if oneAPI is already installed
+      id: check-oneapi
+      run: |
+        if [ -f /home/test-user/intel/oneapi/setvars.sh ]; then
+          echo "installed=true" >> $GITHUB_OUTPUT
+          source /home/test-user/intel/oneapi/setvars.sh
+          printenv | grep -E '^(PATH|LD_LIBRARY_PATH|LIBRARY_PATH|CPATH|C_INCLUDE_PATH|CPLUS_INCLUDE_PATH)=' >> $GITHUB_ENV
+        else
+          echo "installed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Setup oneAPI
+      if: steps.check-oneapi.outputs.installed != 'true'
+      run: |
+        installer="intel-oneapi-toolkit-2026.1.0.192_offline.sh"
+        checksum="9d969de9cafbb698bf50f088c4b5174b50fc816f504049e685d6f6d198e10dbc17ef2cd4cfb0bc2b3d2179644a8d77d1"
+        curl --fail --location --retry 3 --silent --show-error --output "$installer" \
+          "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/33cb2a22-ddf1-4aa9-8d68-1f5a118acaf2/intel-oneapi-toolkit-2026.1.0.192_offline.sh"
+        echo "$checksum  $installer" | sha384sum --check
+        sh "./$installer" -a --silent --cli --eula accept
+
+        source /home/test-user/intel/oneapi/setvars.sh
+        printenv | grep -E '^(PATH|LD_LIBRARY_PATH|LIBRARY_PATH|CPATH|C_INCLUDE_PATH|CPLUS_INCLUDE_PATH)=' >> $GITHUB_ENV
+
+    - name: Create vendored source from current checkout
+      run: |
+        cargo init --bin "$RUNNER_TEMP/vendor-seed"
+        cd "$RUNNER_TEMP/vendor-seed"
+        cargo add sycl-rs --git "file://$GITHUB_WORKSPACE"
+        cargo vendor --versioned-dirs "$RUNNER_TEMP/vendor" > "$RUNNER_TEMP/vendor-config.toml"
+
+    - name: Create hello world project
+      run: |
+        cargo init --bin "$RUNNER_TEMP/crates-io-test"
+        cd "$RUNNER_TEMP/crates-io-test"
+        mkdir .cargo
+        cp "$RUNNER_TEMP/vendor-config.toml" .cargo/config.toml
+        cargo add sycl-rs
+        cat > src/main.rs <<'RS'
+        use sycl_rs::prelude::*;
+
+        fn main() {
+            let platform_count = Platform::get_platforms().len();
+            println!("Hello from oneAPI-rs! Found {platform_count} SYCL platform(s).");
+        }
+        RS
+
+    - name: Build
+      working-directory: ${{ runner.temp }}/crates-io-test
+      run: cargo build --verbose
+
+    - name: Run hello world
+      working-directory: ${{ runner.temp }}/crates-io-test
+      run: cargo run --verbose
