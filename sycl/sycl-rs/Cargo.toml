@@ -21,17 +21,17 @@ homepage.workspace = true
 
 [dependencies]
 allocator-api2 = "0.4.0"
-bytemuck = "1.25.1"
-cxx = "1.0.194"
+bytemuck = "1.25.2"
+cxx = "1.0.198"
 sycl-rs-sys = { version = "0.1.0", path = "../sycl-rs-sys" }
 sycl-rs-derive = { version = "0.1.0", path = "../sycl-rs-derive" }
 pin-project = "1.1.13"
-thiserror = "2.0.18"
+thiserror = "2.0.20"
 
 [dev-dependencies]
 criterion = { version = "0.7.0", features = ["html_reports"] }
 half = { version = "2.7.1", features = ["bytemuck"] }
-tokio = { version = "1.52.3", features = ["macros", "rt", "rt-multi-thread"] }
+tokio = { version = "1.53.1", features = ["macros", "rt", "rt-multi-thread"] }
 
 [[bench]]
 name = "batch_memcpy"

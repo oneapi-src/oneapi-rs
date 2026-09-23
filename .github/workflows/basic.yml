@@ -152,6 +152,60 @@ jobs:
         sarif_file: trivy-results.sarif
         category: trivy
 
+  rustsec:
+    name: RustSec audit (${{ matrix.lockfile }})
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    strategy:
+      # Audit both tracked lockfiles independently; one failure must not cancel the other.
+      fail-fast: false
+      matrix:
+        lockfile:
+          - Cargo.lock
+          - sycl/sycl-rs-sys/Cargo.lock
+
+    steps:
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+    - name: Install Cargo Audit
+      run: |
+        # Cargo Audit 0.22.2 supports SARIF and requires Rust 1.88 or newer.
+        rustup toolchain install stable --profile minimal
+        cargo +stable install cargo-audit --version 0.22.2 --locked --no-default-features
+
+    - name: Audit dependencies against RustSec
+      env:
+        AUDIT_LOCKFILE: ${{ matrix.lockfile }}
+      run: |
+        # Fail on unsoundness warnings, but capture the status so report processing can finish.
+        audit_status=0
+        cargo +stable audit --deny unsound --format sarif --file "$AUDIT_LOCKFILE" > cargo-audit.raw.sarif || audit_status=$?
+        # Cargo Audit reports every location as Cargo.lock; point findings at the scanned file.
+        jq --arg lockfile "$AUDIT_LOCKFILE" \
+          '(.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) = $lockfile' \
+          cargo-audit.raw.sarif > cargo-audit.sarif
+        jq -r --arg lockfile "$AUDIT_LOCKFILE" '
+          [.runs[].results[]?] |
+          "RustSec audit: \($lockfile) - \(length) finding(s)",
+          (.[] | "\(.ruleId): \(.message.text)")
+        ' cargo-audit.sarif
+        # Preserve the audit failure after preparing the SARIF report.
+        exit "$audit_status"
+
+    - name: Upload RustSec findings
+      # Upload generated reports even when the audit step fails on findings.
+      if: ${{ always() && hashFiles('cargo-audit.sarif') != '' }}
+      uses: github/codeql-action/upload-sarif@d8073367669608af8fbcc5f63dd0a0d52bb90cff # v4
+      with:
+        sarif_file: cargo-audit.sarif
+        # Keep the two lockfile analyses separate in GitHub Code Scanning.
+        category: rustsec/${{ matrix.lockfile }}
+
   deploy-documentation:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.deploy_documentation == 'true')
     needs: build-and-test

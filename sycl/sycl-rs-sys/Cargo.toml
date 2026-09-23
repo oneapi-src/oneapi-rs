@@ -12,9 +12,9 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
-cxx = "1.0.194"
-futures = "0.3.33"
+cxx = "1.0.198"
+futures = "0.3.34"
 
 [build-dependencies]
-cxx-build = "1.0.194"
-which = "8.0.4"
+cxx-build = "1.0.198"
+which = "8.0.6"
