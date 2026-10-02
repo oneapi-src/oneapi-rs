@@ -1,5 +1,9 @@
 # oneAPI-rs
 
+[![Basic](https://github.com/oneapi-src/oneapi-rs/actions/workflows/basic.yml/badge.svg?event=schedule)](https://github.com/oneapi-src/oneapi-rs/actions/workflows/basic.yml?query=event%3Aschedule)
+[![CodeQL](https://github.com/oneapi-src/oneapi-rs/actions/workflows/codeql.yml/badge.svg?event=schedule)](https://github.com/oneapi-src/oneapi-rs/actions/workflows/codeql.yml?query=event%3Aschedule)
+[![Crates.io](https://github.com/oneapi-src/oneapi-rs/actions/workflows/crates-io.yml/badge.svg?event=schedule)](https://github.com/oneapi-src/oneapi-rs/actions/workflows/crates-io.yml?query=event%3Aschedule)
+
 Rust bindings for SYCL and the Intel oneAPI programming environment.
 
 > [!WARNING]
