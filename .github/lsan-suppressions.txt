@@ -1,0 +1,3 @@
+# Leaks reported inside the uninstrumented OpenCL CPU runtime
+leak:libOpenCL.so
+leak:libur_adapter_opencl.so
