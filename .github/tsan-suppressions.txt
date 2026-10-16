@@ -1,0 +1,22 @@
+# Prebuilt Intel CPU OpenCL runtime: worker mutex publication and JIT memset
+# versus allocation. Reproduced with a pure C++ queue.memset(...).wait().
+# The exact libc++ mutex symbol is bundled in libintelocl; TSan cannot restrict
+# a symbol match to that module, so this also excludes other libc++ mutex::lock calls.
+race:^std::__1::mutex::lock()$
+race:^Intel::OpenCL::Utils::clAllocateFromHeap(
+
+# Prebuilt SYCL runtime: host-task completion versus event/queue destruction.
+# Reproduced in pure C++ even with queue.wait() before destruction. Internal
+# atomic shared_ptr synchronization is not visible to TSan in these binaries.
+race:^sycl::_V1::detail::Scheduler::NotifyHostTaskCompletion(
+race:^sycl::_V1::detail::event_impl::cleanupDependencyEvents(
+race:^sycl::_V1::detail::Command::~Command(
+
+# Native-only reproduction: copy a host-task event, wait, then release the queue
+# and event copies. The native event destructor frees a shared_ptr control block
+# whose preceding reference-count decrement was in instrumented application code.
+race:^sycl::_V1::detail::event_impl::~event_impl(
+
+# Keep these symbol-scoped: never suppress all of libsycl, the OpenCL adapter,
+# free, memset, pthread calls, or the Rust/C++ shim. Revalidate on toolkit updates
+# and remove entries when TSan-instrumented native runtimes are available.
