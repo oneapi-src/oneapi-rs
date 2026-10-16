@@ -86,6 +86,39 @@ jobs:
         name: documentation
         path: target/doc
 
+  sanitizers:
+    if: github.event_name != 'schedule'
+    runs-on: ["oneapi-rs", "Linux"]
+
+    steps:
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+    - name: Setup oneAPI
+      uses: ./.github/actions/setup-oneapi
+
+    - name: Install nightly toolchain
+      run: rustup toolchain install nightly --profile minimal
+
+    - name: Build and test with hardening flags
+      env:
+        RUSTFLAGS: -Zemit-stack-sizes -Zcf-protection=full
+        CARGO_TARGET_DIR: target/hardened
+      run: |
+        cargo +nightly test --workspace --verbose
+        cargo +nightly build --workspace --release --verbose
+
+    - name: Run tests with sanitizers
+      env:
+        # Test only CPU to avoid issues with GPU drivers and sanitizers
+        ONEAPI_DEVICE_SELECTOR: opencl:cpu
+        ASAN_OPTIONS: fast_unwind_on_malloc=0
+        LSAN_OPTIONS: suppressions=${{ github.workspace }}/.github/lsan-suppressions.txt:fast_unwind_on_malloc=0
+      run: |
+        for sanitizer in address leak; do
+          RUSTFLAGS="-Zsanitizer=$sanitizer" CARGO_TARGET_DIR="target/sanitizer-$sanitizer" \
+            cargo +nightly test --workspace --lib --tests --target x86_64-unknown-linux-gnu --verbose
+        done
+
   trivy:
     name: Trivy scan
     runs-on: ubuntu-latest
