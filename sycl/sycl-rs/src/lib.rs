@@ -106,6 +106,11 @@
 //! [`Queue`](crate::queue::Queue) directly. To do the same asynchronously you have to `.await` an
 //! event returned by [`Queue::barrier()`](crate::queue::Queue::barrier).
 //!
+//! Dropping an enqueued allocation or its future (including a losing `tokio::select!` branch)
+//! blocks until initialization completes before freeing its memory. Other events and queues do not
+//! wait on drop. If an initialization wait fails, the allocation is leaked to avoid freeing memory
+//! still in use; explicit wait/await returns the error, while cancellation during drop panics.
+//!
 //! All basic SYCL wrapper types (`Queue`, `Event`, `Context`, `Platform`, `Device`) are thread safe as
 //! indicated by the provided [`Send`] and [`Sync`] trait implementations. However - `UsmBox`es are
 //! not thread-safe. If you need a thread-safe `UsmBox` you need to wrap it in an `Arc<Mutex<T>>`.

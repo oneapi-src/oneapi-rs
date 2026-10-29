@@ -1,0 +1,6 @@
+
+# Intel GPU OpenCL driver initialization allocations.
+leak:libigdrcl.so
+
+# Intel OpenCL adapter queue/event/context leaks reported at process exit.
+leak:libur_adapter_opencl.so
