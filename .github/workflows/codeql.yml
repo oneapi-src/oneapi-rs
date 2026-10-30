@@ -16,6 +16,10 @@ jobs:
     name: "Analyze (${{ matrix.language }})"
     runs-on: ["oneapi-rs", "Linux"]
 
+    env:
+      # Overlay databases do not support manual build tracing.
+      CODEQL_ACTION_OVERLAY_ANALYSIS: ${{ matrix.build-mode == 'manual' && 'false' || '' }}
+
     permissions:
       actions: read
       contents: read
