@@ -49,6 +49,24 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
     }
 }
 
+/// The raw representation of a SYCL kernel argument.
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum RawKernelArg<'a> {
+    /// The bytes of a trivially copyable value.
+    Bytes(&'a [u8]),
+}
+
+impl<'a> RawKernelArg<'a> {
+    pub(crate) fn into_ffi(self) -> types::ffi::KernelArg<'a> {
+        let Self::Bytes(bytes) = self;
+        types::ffi::KernelArg {
+            kind: types::ffi::KernelArgKind::Bytes,
+            bytes,
+        }
+    }
+}
+
 /// Types which can be passed as SYCL kernel arguments.
 ///
 /// # Safety
@@ -56,18 +74,18 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
 /// A type implementing this trait must mirror the representation and alignment of the
 /// corresponding SYCL kernel argument structure.
 pub unsafe trait KernelArgument {
-    /// Converts self to a raw byte representation.
+    /// Converts self to its raw representation.
     ///
     /// # Safety
     ///
     /// This function returns a reference to raw bytes. These bytes will be passed to FFI
     /// functions. The caller must make sure these functions respect Rust's aliasing rules.
-    unsafe fn as_raw_arg(&self) -> &[u8];
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_>;
 }
 
 unsafe impl<T: Pod> KernelArgument for T {
-    unsafe fn as_raw_arg(&self) -> &[u8] {
-        bytemuck::bytes_of(self)
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
+        RawKernelArg::Bytes(bytemuck::bytes_of(self))
     }
 }
 
@@ -78,23 +96,23 @@ unsafe impl<T: Pod> KernelArgument for T {
 /// A type implementing this trait must mirror the representation and alignment of each
 /// corresponding SYCL kernel argument inside the returned array.
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
-    /// Converts each struct member to a raw byte representation.
+    /// Converts each struct member to its raw representation.
     ///
     /// # Safety
     ///
     /// This function returns references to raw bytes. These bytes will be passed to FFI
     /// functions. The caller must make sure these functions respect Rust's aliasing rules.
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; ARGC];
 }
 
 unsafe impl KernelArgumentList<0> for () {
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 0] {
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; 0] {
         []
     }
 }
 
 unsafe impl<T: KernelArgument> KernelArgumentList<1> for T {
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 1] {
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; 1] {
         [unsafe { self.as_raw_arg() }]
     }
 }

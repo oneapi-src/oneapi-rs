@@ -11,7 +11,7 @@ use sycl_rs_sys::types;
 
 use crate::{
     event::Event,
-    kernel::{Kernel, KernelArgumentList},
+    kernel::{Kernel, KernelArgumentList, RawKernelArg},
     private::Sealed,
     queue::Queue,
 };
@@ -72,10 +72,7 @@ impl ValidDimension for NdRange<1> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list().map(|bytes| types::ffi::KernelArg {
-                    kind: types::ffi::KernelArgKind::Bytes,
-                    bytes,
-                }),
+                &args.as_raw_arg_list().map(RawKernelArg::into_ffi),
             )
         }
         .map(Into::into)
@@ -100,10 +97,7 @@ impl ValidDimension for NdRange<2> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list().map(|bytes| types::ffi::KernelArg {
-                    kind: types::ffi::KernelArgKind::Bytes,
-                    bytes,
-                }),
+                &args.as_raw_arg_list().map(RawKernelArg::into_ffi),
             )
         }
         .map(Into::into)
@@ -128,10 +122,7 @@ impl ValidDimension for NdRange<3> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list().map(|bytes| types::ffi::KernelArg {
-                    kind: types::ffi::KernelArgKind::Bytes,
-                    bytes,
-                }),
+                &args.as_raw_arg_list().map(RawKernelArg::into_ffi),
             )
         }
         .map(Into::into)

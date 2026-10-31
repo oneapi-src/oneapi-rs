@@ -21,7 +21,7 @@ use pin_project::pin_project;
 use crate::{
     Result,
     event::{Event, EventFuture},
-    kernel::KernelArgument,
+    kernel::{KernelArgument, RawKernelArg},
     usm::{
         DeviceAllocator, HostAccessible, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator,
     },
@@ -169,19 +169,19 @@ pub type SharedUsmBoxFuture<T> = UsmBoxFuture<T, UsmAllocator<SharedAllocator>>;
 pub type DeviceUsmBoxFuture<T> = UsmBoxFuture<T, UsmAllocator<DeviceAllocator>>;
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for UsmBox<T, A> {
-    unsafe fn as_raw_arg(&self) -> &[u8] {
-        unsafe { self.as_raw_arg_impl() }
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
+        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
     }
 }
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &UsmBox<T, A> {
-    unsafe fn as_raw_arg(&self) -> &[u8] {
-        unsafe { self.as_raw_arg_impl() }
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
+        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
     }
 }
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &mut UsmBox<T, A> {
-    unsafe fn as_raw_arg(&self) -> &[u8] {
-        unsafe { self.as_raw_arg_impl() }
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
+        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
     }
 }
