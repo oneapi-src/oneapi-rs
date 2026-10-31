@@ -17,6 +17,7 @@ pub mod ffi {
         type Range1 = crate::types::ffi::Range1;
         type Range2 = crate::types::ffi::Range2;
         type Range3 = crate::types::ffi::Range3;
+        type KernelArg<'a> = crate::types::ffi::KernelArg<'a>;
     }
 
     unsafe extern "C++" {
@@ -82,36 +83,36 @@ pub mod ffi {
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment.
-        unsafe fn launch_1d(
+        unsafe fn launch_1d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range1,
             local_size: Range1,
             kernel: &Kernel,
-            args: &[&[u8]],
+            args: &[KernelArg<'a>],
         ) -> Result<UniquePtr<Event>>;
 
         /// # Safety
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment.
-        unsafe fn launch_2d(
+        unsafe fn launch_2d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range2,
             local_size: Range2,
             kernel: &Kernel,
-            args: &[&[u8]],
+            args: &[KernelArg<'a>],
         ) -> Result<UniquePtr<Event>>;
 
         /// # Safety
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment.
-        unsafe fn launch_3d(
+        unsafe fn launch_3d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range3,
             local_size: Range3,
             kernel: &Kernel,
-            args: &[&[u8]],
+            args: &[KernelArg<'a>],
         ) -> Result<UniquePtr<Event>>;
     }
 }
