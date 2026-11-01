@@ -50,20 +50,25 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
 }
 
 /// The raw representation of a SYCL kernel argument.
+///
+/// A backend may take pointers through a different entry point than plain bytes, and cannot
+/// tell the two apart from the bytes alone, so pointers are marked as such.
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum RawKernelArg<'a> {
-    /// The bytes of a trivially copyable value.
+    /// The bytes of a trivially copyable value that is not a pointer.
     Bytes(&'a [u8]),
+    /// The bytes of a pointer to USM memory.
+    Pointer(&'a [u8]),
 }
 
 impl<'a> RawKernelArg<'a> {
     pub(crate) fn into_ffi(self) -> types::ffi::KernelArg<'a> {
-        let Self::Bytes(bytes) = self;
-        types::ffi::KernelArg {
-            kind: types::ffi::KernelArgKind::Bytes,
-            bytes,
-        }
+        let (kind, bytes) = match self {
+            Self::Bytes(bytes) => (types::ffi::KernelArgKind::Bytes, bytes),
+            Self::Pointer(bytes) => (types::ffi::KernelArgKind::Pointer, bytes),
+        };
+        types::ffi::KernelArg { kind, bytes }
     }
 }
 
@@ -72,14 +77,16 @@ impl<'a> RawKernelArg<'a> {
 /// # Safety
 ///
 /// A type implementing this trait must mirror the representation and alignment of the
-/// corresponding SYCL kernel argument structure.
+/// corresponding SYCL kernel argument structure, and must return [`RawKernelArg::Pointer`]
+/// exactly when it represents a pointer to USM memory.
 pub unsafe trait KernelArgument {
     /// Converts self to its raw representation.
     ///
     /// # Safety
     ///
-    /// This function returns a reference to raw bytes. These bytes will be passed to FFI
-    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
+    /// This function returns a reference to raw bytes, marked as a pointer or plain bytes.
+    /// These bytes will be passed to FFI functions. The caller must make sure these functions
+    /// respect Rust's aliasing rules.
     unsafe fn as_raw_arg(&self) -> RawKernelArg<'_>;
 }
 
@@ -94,14 +101,16 @@ unsafe impl<T: Pod> KernelArgument for T {
 /// # Safety
 ///
 /// A type implementing this trait must mirror the representation and alignment of each
-/// corresponding SYCL kernel argument inside the returned array.
+/// corresponding SYCL kernel argument inside the returned array, and each entry must be
+/// [`RawKernelArg::Pointer`] exactly when it represents a pointer to USM memory.
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
     /// Converts each struct member to its raw representation.
     ///
     /// # Safety
     ///
-    /// This function returns references to raw bytes. These bytes will be passed to FFI
-    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
+    /// This function returns references to raw bytes, each marked as a pointer or plain bytes.
+    /// These bytes will be passed to FFI functions. The caller must make sure these functions
+    /// respect Rust's aliasing rules.
     unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; ARGC];
 }
 

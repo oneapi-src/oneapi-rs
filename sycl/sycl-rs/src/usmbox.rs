@@ -76,10 +76,10 @@ impl<T, A: UsmAlloc> UsmBox<T, A> {
         self.len
     }
 
+    /// Returns the bytes of the USM pointer itself, which is what a kernel receives.
     unsafe fn as_raw_arg_impl(&self) -> &[u8] {
-        let data_ptr: *const NonNull<_> = &self.data;
-        let cast_ptr = data_ptr as *const u8;
-        unsafe { slice::from_raw_parts(cast_ptr, std::mem::size_of_val(&cast_ptr)) }
+        let data: *const NonNull<T> = &self.data;
+        unsafe { slice::from_raw_parts(data.cast::<u8>(), std::mem::size_of::<NonNull<T>>()) }
     }
 }
 
@@ -170,18 +170,18 @@ pub type DeviceUsmBoxFuture<T> = UsmBoxFuture<T, UsmAllocator<DeviceAllocator>>;
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for UsmBox<T, A> {
     unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
-        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
+        RawKernelArg::Pointer(unsafe { self.as_raw_arg_impl() })
     }
 }
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &UsmBox<T, A> {
     unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
-        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
+        RawKernelArg::Pointer(unsafe { self.as_raw_arg_impl() })
     }
 }
 
 unsafe impl<T: Pod, A: UsmAlloc> KernelArgument for &mut UsmBox<T, A> {
     unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
-        RawKernelArg::Bytes(unsafe { self.as_raw_arg_impl() })
+        RawKernelArg::Pointer(unsafe { self.as_raw_arg_impl() })
     }
 }
