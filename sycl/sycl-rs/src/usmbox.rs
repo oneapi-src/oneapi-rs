@@ -8,6 +8,7 @@
 
 use std::{
     alloc::{Layout, handle_alloc_error},
+    cell::RefCell,
     ops::{Deref, DerefMut},
     pin::Pin,
     ptr::NonNull,
@@ -21,6 +22,7 @@ use pin_project::pin_project;
 use crate::{
     Result,
     event::{Event, EventFuture},
+    info::{self, InfoTarget},
     kernel::KernelArgument,
     usm::{
         DeviceAllocator, HostAccessible, HostAllocator, SharedAllocator, UsmAlloc, UsmAllocator,
@@ -39,11 +41,16 @@ use crate::{
 /// The `UsmBox` struct takes a generic parameter [`UsmAlloc`](`crate::usm::UsmAlloc`) for
 /// specifying an allocator which is used by the SYCL runtime when allocating temporary memory on
 /// the host.
+///
+/// A `UsmBox` keeps track of the copies and fills that use it, and dropping it waits for them to
+/// complete, so its memory is not freed while a device may still use it.
 pub struct UsmBox<T, A: UsmAlloc> {
     data: NonNull<T>,
     len: usize,
     layout: Layout,
     allocator: A,
+    /// Events of the enqueued commands that may still use the memory.
+    pending: RefCell<Vec<Event>>,
 }
 
 impl<T, A: UsmAlloc> UsmBox<T, A> {
@@ -61,7 +68,25 @@ impl<T, A: UsmAlloc> UsmBox<T, A> {
             len,
             layout,
             allocator,
+            pending: RefCell::default(),
         }
+    }
+
+    /// Records an enqueued command that uses the memory, so that dropping the box waits for it.
+    pub(crate) fn add_pending(&self, event: &Event) {
+        let mut pending = self.pending.borrow_mut();
+        // Forget the completed commands only once the list is full, and leave room for as many
+        // new ones as are still pending, so that recording a command takes amortized constant
+        // time even when many are in flight.
+        if pending.len() == pending.capacity() {
+            pending.retain(|command| {
+                command.get_info::<info::event::CommandExecutionStatus>()
+                    != info::EventCommandStatus::Complete
+            });
+            let still_pending = pending.len();
+            pending.reserve(still_pending);
+        }
+        pending.push(event.clone());
     }
 
     pub(crate) fn get_byte_ptr(&self) -> *mut u8 {
@@ -96,10 +121,15 @@ impl<T, A: UsmAlloc + HostAccessible> DerefMut for UsmBox<T, A> {
     }
 }
 
+/// Waits for the copies and fills that use the `UsmBox`, then frees its memory. If waiting fails,
+/// the memory is leaked, since a command may still be using it.
 impl<T, A: UsmAlloc> Drop for UsmBox<T, A> {
     fn drop(&mut self) {
-        unsafe {
-            self.allocator.deallocate(self.data.cast(), self.layout);
+        let waited = self.pending.get_mut().iter_mut().try_for_each(Event::wait);
+        if waited.is_ok() {
+            unsafe {
+                self.allocator.deallocate(self.data.cast(), self.layout);
+            }
         }
     }
 }
@@ -124,7 +154,7 @@ impl<T, A: UsmAlloc> EnqueuedUsmBox<T, A> {
     /// Performs a blocking wait for the [`UsmBox`] initialization to complete. Returns an error if
     /// a synchronous SYCL exception occurs.
     ///
-    /// Dropping an enqueued array does not wait for its completion.
+    /// Dropping an enqueued array waits for its initialization to complete, then frees it.
     pub fn wait(mut self) -> Result<UsmBox<T, A>> {
         self.event.wait().map(|_| self.array)
     }
