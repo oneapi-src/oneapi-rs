@@ -43,7 +43,7 @@ pub fn derive_kernel_argument_list(input: TokenStream) -> TokenStream {
     let expanded = quote! {
         unsafe impl #impl_generics #oneapi::kernel::KernelArgumentList<#argc>
         for #ident #ty_generics #where_clause {
-            unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
+            unsafe fn as_raw_arg_list(&self) -> [#oneapi::kernel::RawKernelArg<'_>; #argc] {
                 [ #(unsafe { self.#members.as_raw_arg() }),* ]
             }
         }
@@ -69,7 +69,7 @@ fn get_single_tuple_impl(argc: usize) -> proc_macro2::TokenStream {
     quote! {
         unsafe impl<#(#types),*> crate::kernel::KernelArgumentList<#argc> for (#(#types),*)
         where #(#types: crate::kernel::KernelArgument),* {
-            unsafe fn as_raw_arg_list(&self) -> [&[u8]; #argc] {
+            unsafe fn as_raw_arg_list(&self) -> [crate::kernel::RawKernelArg<'_>; #argc] {
                 [ #(unsafe { self.#iter.as_raw_arg() }),* ]
             }
         }

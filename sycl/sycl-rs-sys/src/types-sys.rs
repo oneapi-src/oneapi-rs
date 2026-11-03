@@ -106,6 +106,22 @@ pub mod ffi {
         data: [u64; 3],
     }
 
+    /// How the bytes of a kernel argument are handed to the backend. A backend may take
+    /// pointers through a different entry point than plain bytes, and cannot tell the two
+    /// apart from the bytes alone.
+    #[derive(Debug, Hash)]
+    enum KernelArgKind {
+        /// The bytes of a trivially copyable value that is not a pointer.
+        Bytes,
+        /// The bytes of a pointer to USM memory.
+        Pointer,
+    }
+
+    struct KernelArg<'a> {
+        kind: KernelArgKind,
+        bytes: &'a [u8],
+    }
+
     impl UniquePtr<Device> {}
     impl UniquePtr<Platform> {}
     impl UniquePtr<Queue> {}
