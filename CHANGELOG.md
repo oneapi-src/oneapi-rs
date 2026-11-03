@@ -24,6 +24,8 @@ can be found at: <https://docs.rs/sycl_rs/>
 
 - Initial Rust API for discovering SYCL platforms and devices.
 - Queues, events, contexts, USM allocations, and host/device memory operations.
+- Dropping a `UsmBox` waits for the copies and fills that use it, so its
+  memory is not freed while a device may still use it.
 - Runtime kernel bundle compilation and one-, two-, and three-dimensional
   kernel launch support.
 - Derive support for typed kernel argument lists.

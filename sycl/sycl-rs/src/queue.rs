@@ -140,7 +140,10 @@ impl Queue {
                 ptr: (*e).clone().0,
             })
             .collect::<Vec<_>>();
-        unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }.map(Into::into)
+        let event: Event =
+            unsafe { ffi::memset(&mut self.0, ptr, value, num_bytes, dep_events) }?.into();
+        array.add_pending(&event);
+        Ok(event)
     }
 
     /// Submits a barrier to the queue.
@@ -228,7 +231,7 @@ impl Queue {
             .collect::<Vec<_>>();
 
         let num_bytes = src.get_len() * size_of::<T>();
-        unsafe {
+        let event: Event = unsafe {
             ffi::memcpy(
                 &mut self.0,
                 dst.get_byte_ptr(),
@@ -236,8 +239,11 @@ impl Queue {
                 num_bytes,
                 dep_events,
             )
-        }
-        .map(Into::into)
+        }?
+        .into();
+        src.add_pending(&event);
+        dst.add_pending(&event);
+        Ok(event)
     }
 }
 
