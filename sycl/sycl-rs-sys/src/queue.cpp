@@ -62,10 +62,6 @@ std::unique_ptr<Event> barrier(std::unique_ptr<Queue> &queue,
 
 void wait(std::unique_ptr<Queue> &queue) { queue->wait(); }
 
-// Pointers go through the typed set_arg overload rather than raw_kernel_arg: a
-// backend may take them through a different entry point than plain bytes (the
-// OpenCL CPU device rejects USM pointers passed as bytes), and raw_kernel_arg
-// only takes non-pointer values.
 static void set_kernel_arg(sycl::handler &cgh, std::size_t index,
                            KernelArg const &arg) {
   switch (arg.kind) {
@@ -74,6 +70,12 @@ static void set_kernel_arg(sycl::handler &cgh, std::size_t index,
                 syclexp::raw_kernel_arg(arg.bytes.data(), arg.bytes.size()));
     return;
   case KernelArgKind::Pointer:
+    // Workaround: the byte form of raw_kernel_arg cannot pass pointers
+    // portably, since a backend may take them through a different entry point
+    // (the OpenCL CPU device rejects USM pointers passed as bytes). Use the
+    // typed set_arg overload until the pointer_arg form of raw_kernel_arg
+    // (intel/llvm#23479) lands in a stable Intel LLVM release, where
+    // SYCL_EXT_ONEAPI_RAW_KERNEL_ARG is at least 2.
     cgh.set_arg(index, *reinterpret_cast<void *const *>(arg.bytes.data()));
     return;
   }

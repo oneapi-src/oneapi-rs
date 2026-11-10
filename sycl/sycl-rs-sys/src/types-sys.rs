@@ -117,6 +117,10 @@ pub mod ffi {
         Pointer,
     }
 
+    /// A kernel argument, as a tagged union of its kind and its bytes. This is a workaround: a
+    /// Rust enum with data would be the natural type, but cxx shared enums cannot hold data
+    /// (see <https://cxx.rs/shared.html#shared-structs-and-enums>). sycl-rs exposes it as the
+    /// `RawKernelArg` enum.
     struct KernelArg<'a> {
         kind: KernelArgKind,
         bytes: &'a [u8],
