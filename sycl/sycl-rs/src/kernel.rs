@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::ffi::c_void;
+
 use crate::Result;
 use bytemuck::Pod;
 use sycl_rs_sys::{kernel_bundle::ffi, types};
@@ -58,15 +60,26 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
 pub enum RawKernelArg<'a> {
     /// The bytes of a trivially copyable value that is not a pointer.
     Bytes(&'a [u8]),
-    /// The bytes of a pointer to USM memory.
+    /// The bytes of a pointer to USM memory: exactly one pointer, aligned as a pointer.
     Pointer(&'a [u8]),
 }
 
+/// # Panics
+///
+/// Panics if a [`RawKernelArg::Pointer`] does not hold exactly one pointer, aligned as a pointer,
+/// since the C++ shim reads it in place. No kernel could run with such an argument.
 impl<'a> From<RawKernelArg<'a>> for types::ffi::KernelArg<'a> {
     fn from(arg: RawKernelArg<'a>) -> Self {
         let (kind, bytes) = match arg {
             RawKernelArg::Bytes(bytes) => (types::ffi::KernelArgKind::Bytes, bytes),
-            RawKernelArg::Pointer(bytes) => (types::ffi::KernelArgKind::Pointer, bytes),
+            RawKernelArg::Pointer(bytes) => {
+                assert!(
+                    bytes.len() == size_of::<*const c_void>()
+                        && bytes.as_ptr().cast::<*const c_void>().is_aligned(),
+                    "a pointer kernel argument must hold one aligned pointer"
+                );
+                (types::ffi::KernelArgKind::Pointer, bytes)
+            }
         };
         Self { kind, bytes }
     }

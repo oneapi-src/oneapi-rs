@@ -83,6 +83,8 @@ pub mod ffi {
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment, and must be marked as a pointer exactly when it holds a USM pointer.
+        /// A pointer entry must hold exactly one pointer, aligned as a pointer, and every `kind`
+        /// must be `KernelArgKind::Bytes` or `KernelArgKind::Pointer`.
         unsafe fn launch_1d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range1,
@@ -95,6 +97,8 @@ pub mod ffi {
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment, and must be marked as a pointer exactly when it holds a USM pointer.
+        /// A pointer entry must hold exactly one pointer, aligned as a pointer, and every `kind`
+        /// must be `KernelArgKind::Bytes` or `KernelArgKind::Pointer`.
         unsafe fn launch_2d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range2,
@@ -107,6 +111,8 @@ pub mod ffi {
         ///
         /// Each entry in `args` must match the corresponding kernel parameter's size, layout,
         /// and alignment, and must be marked as a pointer exactly when it holds a USM pointer.
+        /// A pointer entry must hold exactly one pointer, aligned as a pointer, and every `kind`
+        /// must be `KernelArgKind::Bytes` or `KernelArgKind::Pointer`.
         unsafe fn launch_3d<'a>(
             queue: &mut UniquePtr<Queue>,
             global_size: Range3,

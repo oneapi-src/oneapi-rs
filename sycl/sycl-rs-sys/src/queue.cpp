@@ -10,9 +10,6 @@
 #include "sycl-rs-sys/include/utils.hpp"
 #include "sycl-rs-sys/src/queue-sys.rs.h"
 
-#include <cstring>
-#include <stdexcept>
-
 using sycl::ext::intel::property::queue::immediate_command_list;
 using sycl::property::queue::in_order;
 using sycl_shims::utils::vec_to_vector;
@@ -76,17 +73,10 @@ static void set_kernel_arg(sycl::handler &cgh, std::size_t index,
     cgh.set_arg(index,
                 syclexp::raw_kernel_arg(arg.bytes.data(), arg.bytes.size()));
     return;
-  case KernelArgKind::Pointer: {
-    void *pointer;
-    if (arg.bytes.size() != sizeof(pointer))
-      throw std::invalid_argument(
-          "pointer kernel argument is not pointer-sized");
-    std::memcpy(&pointer, arg.bytes.data(), sizeof(pointer));
-    cgh.set_arg(index, pointer);
+  case KernelArgKind::Pointer:
+    cgh.set_arg(index, *reinterpret_cast<void *const *>(arg.bytes.data()));
     return;
   }
-  }
-  throw std::invalid_argument("unknown kernel argument kind");
 }
 
 template <int Dimensions>
