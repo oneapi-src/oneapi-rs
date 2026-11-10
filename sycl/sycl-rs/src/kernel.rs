@@ -62,13 +62,13 @@ pub enum RawKernelArg<'a> {
     Pointer(&'a [u8]),
 }
 
-impl<'a> RawKernelArg<'a> {
-    pub(crate) fn into_ffi(self) -> types::ffi::KernelArg<'a> {
-        let (kind, bytes) = match self {
-            Self::Bytes(bytes) => (types::ffi::KernelArgKind::Bytes, bytes),
-            Self::Pointer(bytes) => (types::ffi::KernelArgKind::Pointer, bytes),
+impl<'a> From<RawKernelArg<'a>> for types::ffi::KernelArg<'a> {
+    fn from(arg: RawKernelArg<'a>) -> Self {
+        let (kind, bytes) = match arg {
+            RawKernelArg::Bytes(bytes) => (types::ffi::KernelArgKind::Bytes, bytes),
+            RawKernelArg::Pointer(bytes) => (types::ffi::KernelArgKind::Pointer, bytes),
         };
-        types::ffi::KernelArg { kind, bytes }
+        Self { kind, bytes }
     }
 }
 
