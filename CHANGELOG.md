@@ -27,3 +27,6 @@ can be found at: <https://docs.rs/sycl_rs/>
 - Runtime kernel bundle compilation and one-, two-, and three-dimensional
   kernel launch support.
 - Derive support for typed kernel argument lists.
+- `RawKernelArg`, which marks USM pointer kernel arguments apart from plain
+  bytes, so kernels also launch on backends that take pointers through a
+  separate entry point, such as the OpenCL CPU device.

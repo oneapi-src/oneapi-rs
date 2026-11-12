@@ -18,6 +18,7 @@ struct EventPtr;
 struct Range1;
 struct Range2;
 struct Range3;
+struct KernelArg;
 } // namespace sycl_shims
 
 namespace sycl_shims::queue {
@@ -37,20 +38,17 @@ std::unique_ptr<Event> memset(std::unique_ptr<Queue> &, std::uint8_t *ptr,
 std::unique_ptr<Event> barrier(std::unique_ptr<Queue> &, rust::Vec<EventPtr>);
 void wait(std::unique_ptr<Queue> &);
 
-std::unique_ptr<Event>
-launch_1d(std::unique_ptr<Queue> &, Range1 global_size, Range1 local_size,
-          Kernel const &,
-          rust::Slice<rust::slice<std::uint8_t const> const> args);
+std::unique_ptr<Event> launch_1d(std::unique_ptr<Queue> &, Range1 global_size,
+                                 Range1 local_size, Kernel const &,
+                                 rust::Slice<KernelArg const> args);
 
-std::unique_ptr<Event>
-launch_2d(std::unique_ptr<Queue> &, Range2 global_size, Range2 local_size,
-          Kernel const &,
-          rust::Slice<rust::slice<std::uint8_t const> const> args);
+std::unique_ptr<Event> launch_2d(std::unique_ptr<Queue> &, Range2 global_size,
+                                 Range2 local_size, Kernel const &,
+                                 rust::Slice<KernelArg const> args);
 
-std::unique_ptr<Event>
-launch_3d(std::unique_ptr<Queue> &, Range3 global_size, Range3 local_size,
-          Kernel const &,
-          rust::Slice<rust::slice<std::uint8_t const> const> args);
+std::unique_ptr<Event> launch_3d(std::unique_ptr<Queue> &, Range3 global_size,
+                                 Range3 local_size, Kernel const &,
+                                 rust::Slice<KernelArg const> args);
 
 std::unique_ptr<Event> memcpy(std::unique_ptr<Queue> &, std::uint8_t *dest,
                               std::uint8_t const *src, std::size_t num_bytes,

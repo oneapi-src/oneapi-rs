@@ -72,7 +72,7 @@ impl ValidDimension for NdRange<1> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list(),
+                &args.as_raw_arg_list().map(types::ffi::KernelArg::from),
             )
         }
         .map(Into::into)
@@ -97,7 +97,7 @@ impl ValidDimension for NdRange<2> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list(),
+                &args.as_raw_arg_list().map(types::ffi::KernelArg::from),
             )
         }
         .map(Into::into)
@@ -122,7 +122,7 @@ impl ValidDimension for NdRange<3> {
                     data: self.local_size,
                 },
                 &kernel.0,
-                &args.as_raw_arg_list(),
+                &args.as_raw_arg_list().map(types::ffi::KernelArg::from),
             )
         }
         .map(Into::into)

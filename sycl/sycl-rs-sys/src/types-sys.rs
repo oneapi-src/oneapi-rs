@@ -106,6 +106,26 @@ pub mod ffi {
         data: [u64; 3],
     }
 
+    /// How the bytes of a kernel argument are handed to the backend. A backend may take
+    /// pointers through a different entry point than plain bytes, and cannot tell the two
+    /// apart from the bytes alone.
+    #[derive(Debug, Hash)]
+    enum KernelArgKind {
+        /// The bytes of a trivially copyable value that is not a pointer.
+        Bytes,
+        /// The bytes of a pointer to USM memory.
+        Pointer,
+    }
+
+    /// A kernel argument, as a tagged union of its kind and its bytes. This is a workaround: a
+    /// Rust enum with data would be the natural type, but cxx shared enums cannot hold data
+    /// (see <https://cxx.rs/shared.html#shared-structs-and-enums>). sycl-rs exposes it as the
+    /// `RawKernelArg` enum.
+    struct KernelArg<'a> {
+        kind: KernelArgKind,
+        bytes: &'a [u8],
+    }
+
     impl UniquePtr<Device> {}
     impl UniquePtr<Platform> {}
     impl UniquePtr<Queue> {}

@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //
 
+use std::ffi::c_void;
+
 use crate::Result;
 use bytemuck::Pod;
 use sycl_rs_sys::{kernel_bundle::ffi, types};
@@ -49,25 +51,61 @@ impl From<cxx::UniquePtr<types::ffi::Kernel>> for Kernel {
     }
 }
 
+/// The raw representation of a SYCL kernel argument.
+///
+/// A backend may take pointers through a different entry point than plain bytes, and cannot
+/// tell the two apart from the bytes alone, so pointers are marked as such.
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum RawKernelArg<'a> {
+    /// The bytes of a trivially copyable value that is not a pointer.
+    Bytes(&'a [u8]),
+    /// The bytes of a pointer to USM memory: exactly one pointer, aligned as a pointer.
+    Pointer(&'a [u8]),
+}
+
+/// # Panics
+///
+/// Panics if a [`RawKernelArg::Pointer`] does not hold exactly one pointer, aligned as a pointer,
+/// since the C++ shim reads it in place. No kernel could run with such an argument.
+impl<'a> From<RawKernelArg<'a>> for types::ffi::KernelArg<'a> {
+    fn from(arg: RawKernelArg<'a>) -> Self {
+        let (kind, bytes) = match arg {
+            RawKernelArg::Bytes(bytes) => (types::ffi::KernelArgKind::Bytes, bytes),
+            RawKernelArg::Pointer(bytes) => {
+                assert!(
+                    bytes.len() == size_of::<*const c_void>()
+                        && bytes.as_ptr().cast::<*const c_void>().is_aligned(),
+                    "a pointer kernel argument must hold one aligned pointer"
+                );
+                (types::ffi::KernelArgKind::Pointer, bytes)
+            }
+        };
+        Self { kind, bytes }
+    }
+}
+
 /// Types which can be passed as SYCL kernel arguments.
 ///
 /// # Safety
 ///
 /// A type implementing this trait must mirror the representation and alignment of the
-/// corresponding SYCL kernel argument structure.
+/// corresponding SYCL kernel argument structure, and must return [`RawKernelArg::Pointer`]
+/// exactly when it represents a pointer to USM memory.
 pub unsafe trait KernelArgument {
-    /// Converts self to a raw byte representation.
+    /// Converts self to its raw representation.
     ///
     /// # Safety
     ///
-    /// This function returns a reference to raw bytes. These bytes will be passed to FFI
-    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
-    unsafe fn as_raw_arg(&self) -> &[u8];
+    /// This function returns a reference to raw bytes, marked as a pointer or plain bytes.
+    /// These bytes will be passed to FFI functions. The caller must make sure these functions
+    /// respect Rust's aliasing rules.
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_>;
 }
 
 unsafe impl<T: Pod> KernelArgument for T {
-    unsafe fn as_raw_arg(&self) -> &[u8] {
-        bytemuck::bytes_of(self)
+    unsafe fn as_raw_arg(&self) -> RawKernelArg<'_> {
+        RawKernelArg::Bytes(bytemuck::bytes_of(self))
     }
 }
 
@@ -76,25 +114,27 @@ unsafe impl<T: Pod> KernelArgument for T {
 /// # Safety
 ///
 /// A type implementing this trait must mirror the representation and alignment of each
-/// corresponding SYCL kernel argument inside the returned array.
+/// corresponding SYCL kernel argument inside the returned array, and each entry must be
+/// [`RawKernelArg::Pointer`] exactly when it represents a pointer to USM memory.
 pub unsafe trait KernelArgumentList<const ARGC: usize> {
-    /// Converts each struct member to a raw byte representation.
+    /// Converts each struct member to its raw representation.
     ///
     /// # Safety
     ///
-    /// This function returns references to raw bytes. These bytes will be passed to FFI
-    /// functions. The caller must make sure these functions respect Rust's aliasing rules.
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; ARGC];
+    /// This function returns references to raw bytes, each marked as a pointer or plain bytes.
+    /// These bytes will be passed to FFI functions. The caller must make sure these functions
+    /// respect Rust's aliasing rules.
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; ARGC];
 }
 
 unsafe impl KernelArgumentList<0> for () {
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 0] {
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; 0] {
         []
     }
 }
 
 unsafe impl<T: KernelArgument> KernelArgumentList<1> for T {
-    unsafe fn as_raw_arg_list(&self) -> [&[u8]; 1] {
+    unsafe fn as_raw_arg_list(&self) -> [RawKernelArg<'_>; 1] {
         [unsafe { self.as_raw_arg() }]
     }
 }

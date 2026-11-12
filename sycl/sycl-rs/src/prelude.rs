@@ -10,7 +10,7 @@ pub use crate::{
     context::Context,
     device::{Aspect, Device},
     info::{self, InfoTarget},
-    kernel::{Kernel, KernelArgument, KernelArgumentList},
+    kernel::{Kernel, KernelArgument, KernelArgumentList, RawKernelArg},
     platform::Platform,
     queue::Queue,
     range::{NdRange, Range},
