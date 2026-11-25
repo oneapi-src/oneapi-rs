@@ -20,7 +20,6 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
-allocator-api2 = "0.4.0"
 bytemuck = "1.25.2"
 cxx = "1.0.198"
 sycl-rs-sys = { version = "0.1.0", path = "../sycl-rs-sys" }

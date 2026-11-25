@@ -43,10 +43,22 @@ jobs:
 
     - name: Create vendored source from current checkout
       if: matrix.install == 'vendored'
+      env:
+        # Runner's _work files fail git's ownership check; trust only the snapshot repo.
+        GIT_CONFIG_COUNT: "1"
+        GIT_CONFIG_KEY_0: safe.directory
+        GIT_CONFIG_VALUE_0: ${{ runner.temp }}/sycl-rs-src
       run: |
+        # The runner's reused checkout can reference missing objects, so give cargo a clean repo.
+        src="$RUNNER_TEMP/sycl-rs-src"
+        rm -rf "$src" && mkdir -p "$src"
+        tar -C "$GITHUB_WORKSPACE" --exclude=./.git --exclude=./target -cf - . | tar -x --no-same-owner -C "$src"
+        git -C "$src" init -q
+        git -C "$src" add -A
+        git -C "$src" -c user.name=ci -c user.email=ci@localhost commit -q -m snapshot
         cargo init --bin "$RUNNER_TEMP/vendor-seed"
         cd "$RUNNER_TEMP/vendor-seed"
-        cargo add sycl-rs --git "file://$GITHUB_WORKSPACE"
+        cargo add sycl-rs --git "file://$src"
         cargo vendor --versioned-dirs "$RUNNER_TEMP/vendor" > "$RUNNER_TEMP/vendor-config.toml"
 
     - name: Query latest version on crates.io

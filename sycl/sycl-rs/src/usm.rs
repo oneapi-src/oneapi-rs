@@ -8,10 +8,13 @@
 
 use crate::queue::Queue;
 
-use allocator_api2::alloc::{AllocError, Allocator};
 use sycl_rs_sys::usm::ffi;
 
-use std::{alloc::Layout, marker::PhantomData, ptr::NonNull};
+use std::{
+    alloc::{AllocError, Allocator, Layout},
+    marker::PhantomData,
+    ptr::NonNull,
+};
 
 type CxxResult<T> = cxx::core::result::Result<T, cxx::Exception>;
 
